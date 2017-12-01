@@ -84,7 +84,7 @@ class Nanotest
           table.each do |args, value|
             result = run(expr, opts[:binding], *args)
             unless result == value
-              return message+"\nincorrectly mapped\n#{args}\nto\n#{value}"
+              return message+"\nincorrectly mapped\n#{args}\nto\n#{result}\nexpected\n#{value}"
             end
           end
           return true
