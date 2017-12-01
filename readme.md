@@ -2,6 +2,8 @@ Nanotest
 ============
 Nanotest is a minimalistic library for writing test cases in ruby. It was built with test driven development in mind, but tries to make no assumptions about the use case the tests are written for.
 
+One of nanotests simplicity goals is that the entire core implementation fits on my (rotated) screen in the font size I use during development. The main design filosophy is doing as much as possible with as little code and as little documentation as possible. One shouldn't have to spend hours learning a tool that doesn't get any work done by itself, like it's often the case with other testing frameworks that expect the user to learn an entire DSL for something that most of the time isn't even a part of the actual product, but a tool used to ensure its quality and *save time*.
+
 Introcuction
 ------------
 At the core of the library is the Nanotest class; which defines what a test looks like. A nanotest instance is a collection of subtests consisting of a message and a lambda.
@@ -80,6 +82,16 @@ supertest.sub world_test # These two lines
 supertest << world_test  # Are equivalent
 ```
 
+*Anonymous subtests* can also be used; these are subtests that are created and directly added to a supertest to allow for a group of tests with different options (more on those later) or make it easier to possibly turn them into a full test case in the future.
+
+```ruby
+supertest = Nanotest.new "My software should work"
+supertest.add Nanotest.define "My math should work" do
+  add "addition", ->{1+1=2}
+  add "subtraction", ->{1-1=0}
+end
+```
+
 Eval Module
 ------------
 Of course, with only the primitives mentioned above, creating tests for complex projects would still be a lot of work. For that reason Nanotest comes with a few modules that add factory functions for common tests.
@@ -114,7 +126,7 @@ Nanotest::Eval::fails(expr, opts={})
 Nanotest::eval::maps(expr, table, opts={})
 ```
 
-`maps` is possibly the most powerful function in the Eval module. It takes an expression and a map (known as hash in ruby-speek), and evaluates the function for each pair in the map with the values of the key (which should be an array) as arguments, and fails when the result differs from the corresponding value.
+`maps` is possibly the most powerful function in the Eval module. It takes an expression and a map (known as hash in ruby-speek), and evaluates the function for each pair in the map with the values of the key (which should be an array) as arguments, and fails when the result differs from the corresponding value. As always, a hash can be passed as third argument for options.
 
 ```ruby
 abs = ->(x){x>=0 ? x : -x}
@@ -138,3 +150,55 @@ Before/After
 
 Options
 ------------
+
+Advanced Uses
+====================
+
+Arguments and Subtests
+------------
+
+As stated above, not repeating oneself is *kind of* an important concept in programming, and subtests serve that purpose (among others). But if you write a test once, there's no real point in running it more than once, specially since the `lambda` object is closed in the context of its creation. So what's the point anyway?
+
+Argumens. The answer is arguments. Imagine the following test:
+
+```ruby
+adder = ->(a,b) {a+b}
+...
+test_adder = Nanotest.define "A lambda should correctly add two numbers" begin
+  add "Should correctly add  1 + 1", -> {adder.call(1,1) ==  2}
+  add "Should correctly add  0 + 1", -> {adder.call(1,1) ==  1}
+  add "Should correctly add -1 + 0", -> {adder.call(1,1) == -1}
+end
+```
+
+This test only checks a single lambda, and the deterministic nature of the test means it will yield the same results every time we try it. A way to avoid this would be to do the following:
+
+```ruby
+...
+test_adder_generic = Nanotest.define "A lambda should add two numbers" begin
+  add "Should correctly add  1 + 1", ->(arg_adder){arg_adder.call(1,1) ==  2}
+  ...
+end
+...
+```
+
+Now we have a NanoTest with three subtests that each take an argument... but where does that argument come from?
+
+```ruby
+... # define two adder lambdas
+test_adder_generic.run(optimized_adder_function)
+test_adder_generic.run(portable_adder_function)
+```
+
+Like this; when running a test, any argument to the run method is passed to all the subtests. But the best part comes now:
+
+```ruby
+Nanotest.define "Test optimized code" do
+  sub test_adder_generic, optimized_adder_function
+end
+...
+# same for portable code
+```
+
+The `sub` method passes all aditional arguments after the subtest to the subtests `run` method. This allows reusing a subtest with different arguments, be they algorithms in the form of lambdas, different values, objects, classes, etc. Imagine, for example, writing a generic test that makes sure that a class implements a certain defined interface; it should answer to certain signals, maybe return some specific kinds of values, like version strings matching a certain pattern, etc.
+This subtest could then be reused countless times with many different implementations, or even be the main specification of the interface (if it is well enough documented, at least).
