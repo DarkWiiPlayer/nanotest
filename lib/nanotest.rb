@@ -76,7 +76,7 @@ class Nanotest
       else
         notify(result || test[0],false,i) unless opts :silent
         all_pass = false
-        return false if opts :abord_on_fail
+        return false if opts :abort_on_fail
         break if opts :break_on_fail
       end
     end
