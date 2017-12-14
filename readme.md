@@ -134,9 +134,9 @@ Nanotest.run do
   add Nanotest::Eval::maps
     abs,
     {
-      1 => 1
-      -1 => 1
-      0 => 0
+      [1] => 1
+      [-1] => 1
+      [0] => 0
     },
     message: "Tests lambda to calculate absolute values"
 end
