@@ -1,4 +1,5 @@
 @echo off
+call pik 24 x64
 call gem build nanotest.gemspec
 call gem install nanotest*.gem
 

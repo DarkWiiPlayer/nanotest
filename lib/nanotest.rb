@@ -1,27 +1,23 @@
 class Nanotest
   def self.version
-    return [0, 1, 0]
+    return [0, 1, 1]
   end
 
-  def self.run(msg=nil,opts={},&block)
-    test = new msg, opts
-    test.instance_eval &block
+  def self.run(opts={},&block)
+    test = new opts, &block
     test.run
   end
-  def self.define(message="", opts={}, &block)
-    test = new message, opts
-    new.instance_eval &block
-    return new
-  end
 
-  def initialize(message=nil, opts={})
+  def initialize(opts={}, &block)
     @tests = []
     @before = [] # setup
     @after = [] # cleanup
     @opts = opts
-    @message = message
+    self.instance_eval &block if block
   end
-  attr_reader :message
+  def message
+    @opts[:message] or "Unnamed Test"
+  end
 
   def <<(arg)
     case arg.class
@@ -35,6 +31,8 @@ class Nanotest
   def add(arg, test=nil)
     if arg.is_a? String and test.is_a? Proc then
       @tests << [arg, test]
+    elsif arg.is_a? Proc then
+      @tests << ["Unnamed test case", arg]
     elsif arg.is_a? Array then
       add Hash[*arg.flatten]
     elsif arg.is_a? Hash then
@@ -70,7 +68,11 @@ class Nanotest
       tests = @tests
     end
     tests.each_with_index do |test, i|
-      result = test[1].call(*args)
+      begin
+        result = test[1].call(*args)
+      rescue StandardError => e
+        result = "#{test[0]}\nTest threw an exception:\n#{e.message}"
+      end
       if result and not result.is_a? String then
         notify(test[0],true,i) if opts :notify_pass, :verbose
       else

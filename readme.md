@@ -13,7 +13,7 @@ A test fails when the lambda returns a falsey value (`false` or `nil`) or a stri
 Before doing any actual programming, let's first check that the universe still makes sense:
 
 ```ruby
-world_test = Nanotest.new "The world should make sense"
+world_test = Nanotest.new(message: "The world should make sense")
 world_test.add "One equals one", lambda { return 1 == 1 }
 world_test.run
 ```
@@ -50,7 +50,9 @@ Define and run
 ------------
 The Nanotest class has two useful functions for defining tests on the fly:
 
-`define` creates a new instance, takes a block and runs it in the context of the new object and then returns that instance.
+**Define has been removed in version 1.1, use `Nanotest.new { block }` instead.**
+
+~~`define` creates a new instance, takes a block and runs it in the context of the new object and then returns that instance.~~
 
 `run` acts the same way, but it calls `run` on the new instance after evaluating the block and returns the result of `run` instead.
 
@@ -59,7 +61,7 @@ Arguments
 All arguments to the run() method arepassed to each individual test. Therefore it is recommended to write lambdas as `-> (*args) {...}` when they are meant to be reusable. You can also use this to write reusable test cases:
 
 ```ruby
-test_number = Nanotest.define do
+test_number = Nanotest.new do
   add "Larger than 0",
     -> (x, *rest) {x>0 ? true : "Number (#{x}) is <= 0"}
   add "Smaller than 100",
@@ -76,7 +78,7 @@ Subtests
 Not repeating oneself is kind of a thing in programming, therefore Nanotest allows adding other test instances as subtests.
 
 ```ruby
-supertest = Nanotest.new "Everything should be fine"
+supertest = Nanotest.new message: "Everything should be fine"
 supertest.add "Yes it is", -> { true }
 supertest.sub world_test # These two lines
 supertest << world_test  # Are equivalent
@@ -85,8 +87,8 @@ supertest << world_test  # Are equivalent
 *Anonymous subtests* can also be used; these are subtests that are created and directly added to a supertest to allow for a group of tests with different options (more on those later) or make it easier to possibly turn them into a full test case in the future.
 
 ```ruby
-supertest = Nanotest.new "My software should work"
-supertest.add Nanotest.define "My math should work" do
+supertest = Nanotest.new(message: "My software should work")
+supertest.add Nanotest.new(message: "My math should work") do
   add "addition", ->{1+1=2}
   add "subtraction", ->{1-1=0}
 end
@@ -99,7 +101,7 @@ Of course, with only the primitives mentioned above, creating tests for complex 
 ```ruby
 require "nanotest/eval"
 E = Nanotest::Eval
-Nanotest.run do # like define, but runs the test at the end
+Nanotest.run do # like new with block, but runs the test at the end
   add E::equal { return 100 }, "100"
   # Compares the results of two expressions
 end
@@ -164,7 +166,7 @@ Argumens. The answer is arguments. Imagine the following test:
 ```ruby
 adder = ->(a,b) {a+b}
 ...
-test_adder = Nanotest.define "A lambda should correctly add two numbers" begin
+test_adder = Nanotest.new(message: "A lambda should correctly add two numbers") begin
   add "Should correctly add  1 + 1", -> {adder.call(1,1) ==  2}
   add "Should correctly add  0 + 1", -> {adder.call(1,1) ==  1}
   add "Should correctly add -1 + 0", -> {adder.call(1,1) == -1}
@@ -175,7 +177,7 @@ This test only checks a single lambda, and the deterministic nature of the test 
 
 ```ruby
 ...
-test_adder_generic = Nanotest.define "A lambda should add two numbers" begin
+test_adder_generic = Nanotest.new(message: "A lambda should add two numbers") begin
   add "Should correctly add  1 + 1", ->(arg_adder){arg_adder.call(1,1) ==  2}
   ...
 end
@@ -193,7 +195,7 @@ test_adder_generic.run(portable_adder_function)
 Like this; when running a test, any argument to the run method is passed to all the subtests. But the best part comes now:
 
 ```ruby
-Nanotest.define "Test optimized code" do
+Nanotest.new(message: "Test optimized code") do
   sub test_adder_generic, optimized_adder_function
 end
 ...
