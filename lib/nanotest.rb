@@ -56,7 +56,7 @@ class Nanotest
     raise ArgumentError, <<~EOM unless subtest.is_a? self.class
       First argument should be a test object (is #{subtest.class})
     EOM
-    add subtest.message, -> (*largs) { subtest.run(*args, *largs) }
+    add "(subtest) "+subtest.message, -> (*largs) { subtest.run(*args, *largs) }
   end
 
   def run(*args)
@@ -87,7 +87,7 @@ class Nanotest
   end
 
   def notify(msg, pass, i=0)
-    puts "Test #{pass ? "passed" : "failed"}: #{msg}"
+    puts "#{@opts[:prefix] ? @opts[:prefix].to_s : ""}Test #{pass ? "passed" : "failed"}: #{msg}"
   end
 
   def opts(*args)
