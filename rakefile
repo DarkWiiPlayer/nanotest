@@ -1,0 +1,15 @@
+task default: :update
+
+task :build do
+  system "gem build nanotest.gemspec"
+end
+
+task :install do
+  system "gem install nanotest*.gem"
+end
+
+task :test do
+  system "ruby selftest.rb"
+end
+
+task update: [:build, :install, :test]
