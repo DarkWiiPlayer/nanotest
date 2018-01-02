@@ -42,23 +42,17 @@ As an alternative to the `add` method, Nanotest overloads the `<<` operator, all
 
 ```ruby
 world_test << ["message", -> {true}]
-# This doesn't work though:
-# world_test << "message", -> {true}
 ```
 
-Define and run
+new{} and run{}
 ------------
-The Nanotest class has two useful functions for defining tests on the fly:
+To make defining tests on the fly easier, `Nanotest.new` and `Nanotest.run` both accept a block that is evaluated in the context of the new instance. `new` returns said instance, while `run` calls `run` on the new instance and returns its result.
 
-**Define has been removed in version 1.1, use `Nanotest.new { block }` instead.**
-
-~~`define` creates a new instance, takes a block and runs it in the context of the new object and then returns that instance.~~
-
-`run` acts the same way, but it calls `run` on the new instance after evaluating the block and returns the result of `run` instead.
+`Nanotest.run` takes the same arguments as `new`, and passes all extra arguments to the `run` instance method.
 
 Arguments
 ------------
-All arguments to the run() method arepassed to each individual test. Therefore it is recommended to write lambdas as `-> (*args) {...}` when they are meant to be reusable. You can also use this to write reusable test cases:
+All arguments to the run() method are passed to each individual test. Therefore it is recommended to write lambdas as `-> (*args) {...}` when they are meant to be reusable. You can also use this to write reusable test cases:
 
 ```ruby
 test_number = Nanotest.new do

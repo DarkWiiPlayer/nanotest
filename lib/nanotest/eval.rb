@@ -77,14 +77,14 @@ class Nanotest
     end
 
     def self.maps(expr, table, opts={})
-      message = opts[:message] || "`#{expr}` should evaluate each key to its corresponding value"
+      message = opts[:message] || "`#{expr}` should evaluate each key to its corresponding value."
       [
         message,
         lambda do |*_|
           table.each do |args, value|
             result = run(expr, opts[:binding], *args)
             unless result == value
-              return message+"\nincorrectly mapped\n#{args}\nto\n#{result}\nexpected\n#{value}"
+              return message+"\nIncorrectly mapped\n#{args.join(", ")}\nto\n#{result}\nexpected\n#{value}"
             end
           end
           return true
