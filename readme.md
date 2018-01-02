@@ -161,9 +161,9 @@ Argumens. The answer is arguments. Imagine the following test:
 adder = ->(a,b) {a+b}
 ...
 test_adder = Nanotest.new(message: "A lambda should correctly add two numbers") begin
-  add "Should correctly add  1 + 1", -> {adder.call(1,1) ==  2}
-  add "Should correctly add  0 + 1", -> {adder.call(1,1) ==  1}
-  add "Should correctly add -1 + 0", -> {adder.call(1,1) == -1}
+  add "Should correctly add  1 + 1", -> {adder.call( 1,1) ==  2}
+  add "Should correctly add  0 + 1", -> {adder.call( 0,1) ==  1}
+  add "Should correctly add -1 + 0", -> {adder.call(-1,0) == -1}
 end
 ```
 
