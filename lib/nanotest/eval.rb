@@ -1,4 +1,4 @@
-require "nanotest/common"
+require_relative "common"
 
 class Nanotest
   module Eval

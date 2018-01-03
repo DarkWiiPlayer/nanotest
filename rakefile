@@ -1,15 +1,13 @@
-task default: :update
-
-task :build do
-  system "gem build nanotest.gemspec"
-end
-
-task :install do
-  system "gem install nanotest*.gem"
-end
+task default: :install
 
 task :test do
-  system "ruby selftest.rb"
+  abort unless system "ruby selftest.rb"
 end
 
-task update: [:build, :install, :test]
+task build: :test do
+  abort unless system "gem build nanotest.gemspec"
+end
+
+task install: :build do
+  system "gem install nanotest*.gem"
+end

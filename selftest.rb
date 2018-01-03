@@ -1,23 +1,21 @@
-require "nanotest"
-require "nanotest/args"
-require "nanotest/eval"
+require_relative "lib/nanotest"
+require_relative "lib/nanotest/args"
+require_relative "lib/nanotest/eval"
 
 class OhMyGawdException < StandardError; end
 
-# First of all check the integrity of the basic functionality:
-
-passes = Nanotest.new do
-  add "Test should not fail", -> (test) { test.run==0 }
-end
-
-fails = Nanotest.new do
-  add "Test should fail", -> (test) { test.run>0 }
-end
+# First of all check the very basics are working
 
 raise "Something very basic is broken :(" if [
-  passes.run(Nanotest.new(silent: true){ add "Truth should be truthy",->{ true } }),
-  fails.run(Nanotest.new(silent: true){ add "Witchcraft should work",->{ "Witchcraft" == "Works" } }),
-].any? { |e| e>0 }
+  Nanotest.run(silent: true){ add -> { true } } < 1,
+  Nanotest.run(silent: true){ add -> { "Witchcraft" == "Works" } } > 0,
+].any? { |e| !e }
+
+raise "Nanotest can't count :(" unless Nanotest.run(silent: true) {
+  7.times {
+    add -> { false }
+  }
+} == 7
 
 Nanotest.run break_on_fail: true, prefix: "> " do
   add "Adding tests should work correctly", -> do
@@ -155,7 +153,7 @@ Nanotest.run break_on_fail: true, prefix: "> " do
   end
   add "Eval::succeeds should fail when an error is risen (#{__FILE__}:#{__LINE__})", -> do
     (Nanotest.run silent: true do
-      add Nanotest::Eval::succeeds -> { error "Hello World" }
+      add Nanotest::Eval::succeeds -> { raise "Hello World" }
     end) == 1
   end
 
@@ -172,7 +170,7 @@ Nanotest.run break_on_fail: true, prefix: "> " do
 
   add "Eval::fails should succeed when an error is risen (#{__FILE__}:#{__LINE__})", -> do
     (Nanotest.run silent: true do
-      add Nanotest::Eval::fails -> { error "Hello World" }
+      add Nanotest::Eval::fails -> { raise "Hello World" }
     end) == 0
   end
   add "Eval::fails should fail when no error is risen (#{__FILE__}:#{__LINE__})", -> do
@@ -215,7 +213,7 @@ Nanotest.run break_on_fail: true, prefix: "> " do
         end) == 0
       end,
 
-      "Eval::maps should not react to exceptions if the nothrow option is set" => -> do
+      "Eval::maps should not react to exceptions if the noraise option is set" => -> do
         (Nanotest.run silent: true do
           add Nanotest::Eval::maps(
             ->(x){x+1}, {
@@ -237,4 +235,5 @@ Nanotest.run break_on_fail: true, prefix: "> " do
 
   # Adding an after filter
   after -> (success) { puts success ? "All good ♥" : "\nSomething went wrong :|" }
+  after -> (success) { raise RuntimeError unless success }
 end
