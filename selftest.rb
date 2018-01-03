@@ -7,7 +7,7 @@ class OhMyGawdException < StandardError; end
 # First of all check the integrity of the basic functionality:
 
 passes = Nanotest.new do
-  add "Test should fail", -> (test) { test.run==0 }
+  add "Test should not fail", -> (test) { test.run==0 }
 end
 
 fails = Nanotest.new do
@@ -36,10 +36,18 @@ Nanotest.run break_on_fail: true, prefix: "> " do
   end
 
   # Adding Subtests
-  subtest = Nanotest.new
-  subtest.add -> { 1 + 1 == 2 }
-  subtest.add -> { 2 + 2 == 4 }
-  sub subtest
+
+  add "Test should fail when a subtest fails", -> do
+    test = Nanotest.new silent: true
+    test.sub Nanotest.new(silent: true) { add -> { false } }
+    test.run > 0
+  end
+
+  add "Test should succeed when no subtest fails", -> do
+    test = Nanotest.new silent: true
+    test.sub Nanotest.new(silent: true) { add -> { true } }
+    test.run < 1
+  end
 
   add "Should pass arguments of `run` to Subtests", -> do
     arguments = [1, "hello", :world]
@@ -92,6 +100,8 @@ Nanotest.run break_on_fail: true, prefix: "> " do
   //////// EVAL MODULE ////////
 =end
 
+  # Test boolean testing components
+
   add "Test Eval::Truthy", -> {
     (Nanotest.run silent: true do
       add Nanotest::Eval::truthy "true"
@@ -136,34 +146,85 @@ Nanotest.run break_on_fail: true, prefix: "> " do
     end) == 0
   end
 
-  add "Test Eval::succeeds", -> do
+  # Test exception testing components
+
+  add "Eval::succeeds should succeed when no error is risen (#{__FILE__}:#{__LINE__})", -> do
     (Nanotest.run silent: true do
       add Nanotest::Eval::succeeds -> { return 1 + 1 }
-    end) == 0 and
+    end) == 0
+  end
+  add "Eval::succeeds should fail when an error is risen (#{__FILE__}:#{__LINE__})", -> do
     (Nanotest.run silent: true do
       add Nanotest::Eval::succeeds -> { error "Hello World" }
     end) == 1
   end
 
-  add "Test Eval::fails", -> do
+  add "Eval::succeeds should detect the right exception (#{__FILE__}:#{__LINE__})", -> do
+    (Nanotest.run silent: true do
+      add Nanotest::Eval::succeeds(-> { raise ArgumentError }, exception: ArgumentError)
+    end) == 1
+  end
+  add "Eval::succeeds should not detect a different exception (#{__FILE__}:#{__LINE__})", -> do
+    (Nanotest.run silent: true do
+      add Nanotest::Eval::succeeds(-> { raise RuntimeError }, exception: ArgumentError)
+    end) == 0
+  end
+
+  add "Eval::fails should succeed when an error is risen (#{__FILE__}:#{__LINE__})", -> do
     (Nanotest.run silent: true do
       add Nanotest::Eval::fails -> { error "Hello World" }
-    end) == 0 and
+    end) == 0
+  end
+  add "Eval::fails should fail when no error is risen (#{__FILE__}:#{__LINE__})", -> do
     (Nanotest.run silent: true do
       add Nanotest::Eval::fails -> { 1 + 1 == 2 }
     end) == 1
   end
 
-  sub (Nanotest.new silent: false, message: "Test Eval::maps" do
+  add "Eval::fails should detect the right exception (#{__FILE__}:#{__LINE__})", -> do
+    (Nanotest.run silent: true do
+      add Nanotest::Eval::fails(-> { raise ArgumentError }, exception: ArgumentError)
+    end) == 0
+  end
+  add "Eval::fails should not detect a different exception (#{__FILE__}:#{__LINE__})", -> do
+    (Nanotest.run silent: true do
+      add Nanotest::Eval::fails(-> { raise RuntimeError }, exception: ArgumentError)
+    end) == 1
+  end
+
+  # Test result testing components
+  
+  sub (Nanotest.new message: "Test Eval::maps (#{__FILE__}:#{__LINE__})", prefix: "maps> " do
     add({
-      "Eval::maps should do its job" => -> do
+      "Eval::maps should check if the function maps a series of value tuples to the corresponding results" => -> do
         (Nanotest.run silent: true do
-          add Nanotest::Eval::maps(->(x){x+1}, {[1]=>2, [2]=>3})
+          add Nanotest::Eval::maps(
+            ->(x){x+1}, {
+              [1]=>2,
+              [2]=>3,
+            })
         end) == 0
-      end
-    })
-    add({
-      "Eval::maps should fail when the values don't match" => -> do
+      end,
+
+      "Eval::maps should react to exceptions" => -> do
+        (Nanotest.run do
+          add Nanotest::Eval::maps(
+            ->(x){x+1}, {
+              [:a]=>NoMethodError,
+            })
+        end) == 0
+      end,
+
+      "Eval::maps should not react to exceptions if the nothrow option is set" => -> do
+        (Nanotest.run silent: true do
+          add Nanotest::Eval::maps(
+            ->(x){x+1}, {
+              [:a]=>NoMethodError,
+            }, noraise: true)
+        end) == 1
+      end,
+      
+      "Eval::maps should fail when the values don't match (#{__FILE__}:#{__LINE__}" => -> do
         (Nanotest.run silent: true do
           add Nanotest::Eval::maps(->(x){x+1}, {[1]=>3})
         end) == 1
