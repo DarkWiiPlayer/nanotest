@@ -57,21 +57,21 @@ class Nanotest
     end
 
     def self.succeeds(expr, opts={})
-      message = opts[:message] || "'#{expr}' should succeed without errors"
+      message = opts[:message] || "Expression '#{expr}' should succeed without errors"
       [
         message,
         lambda do |*args|
-          !Nanotest::Common::raises?(expr, opts[:binding], *args)
+          !Nanotest::Common::raises?(expr, opts[:exception], opts[:binding], *args)
         end,
       ]
     end
 
     def self.fails(expr, opts={})
-      message = opts[:message] || "'#{expr}' should fail with an error"
+      message = opts[:message] || "'Expression #{expr}' should fail with an error"
       [
         message,
         lambda do |*args|
-          Nanotest::Common::raises?(expr, opts[:binding], *args)
+          Nanotest::Common::raises?(expr, opts[:exception], opts[:binding], *args)
         end ,
       ]
     end
@@ -82,7 +82,12 @@ class Nanotest
         message,
         lambda do |*_|
           table.each do |args, value|
-            result = run(expr, opts[:binding], *args)
+            begin
+              result = run(expr, opts[:binding], *args)
+            rescue Exception => e
+              raise e if opts[:noraise]
+              result = e.class
+            end
             unless result == value
               return message+"\nIncorrectly mapped\n#{args.join(", ")}\nto\n#{result}\nexpected\n#{value}"
             end
