@@ -57,7 +57,7 @@ class Nanotest
     raise ArgumentError, <<~EOM unless subtest.is_a? self.class
       First argument should be a test object (is #{subtest.class})
     EOM
-    add "(subtest) "+subtest.message, -> (*largs) { subtest.run(*args, *largs) }
+    add "(subtest) "+subtest.message, -> (*largs) { subtest.run(*args, *largs) == 0 }
   end
 
   def run(*args)
