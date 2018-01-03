@@ -83,8 +83,8 @@ supertest << world_test  # Are equivalent
 ```ruby
 supertest = Nanotest.new(message: "My software should work")
 supertest.add Nanotest.new(message: "My math should work") do
-  add "addition", ->{1+1=2}
-  add "subtraction", ->{1-1=0}
+  add "addition", ->{1+1==2}
+  add "subtraction", ->{1-1==0}
 end
 ```
 
