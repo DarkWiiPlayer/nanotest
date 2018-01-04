@@ -2,8 +2,6 @@ require_relative "lib/nanotest"
 require_relative "lib/nanotest/args"
 require_relative "lib/nanotest/eval"
 
-class OhMyGawdException < StandardError; end
-
 # First of all check the very basics are working
 
 raise "Something very basic is broken :(" if [
@@ -17,7 +15,7 @@ raise "Nanotest can't count :(" unless Nanotest.run(silent: true) {
   }
 } == 7
 
-Nanotest.run break_on_fail: true, prefix: "> " do
+Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
   add "Adding tests should work correctly", -> do
     t = Nanotest.new silent: true do
       add -> { true }
@@ -94,13 +92,19 @@ Nanotest.run break_on_fail: true, prefix: "> " do
     end) == 0
   end
 
+  sub Nanotest.new(message: "Tests should throw when the :throw option is set and they fail", silent: true) {
+    add Nanotest::Eval::fails -> do
+      Nanotest.run(silent: true, raise: true) { add -> { false } }
+    end, exception: NanoTestFailed
+  }
+
 =begin
   //////// EVAL MODULE ////////
 =end
 
   # Test boolean testing components
 
-  add "Test Eval::Truthy", -> {
+  add "Test Eval::truthy", -> {
     (Nanotest.run silent: true do
       add Nanotest::Eval::truthy "true"
       add Nanotest::Eval::truthy -> { true }
@@ -111,7 +115,7 @@ Nanotest.run break_on_fail: true, prefix: "> " do
     end) == 2
   }
 
-  add "Test Eval::Falsey", -> {
+  add "Test Eval::falsey", -> {
     (Nanotest.run silent: true do
       add Nanotest::Eval::falsey "false"
       add Nanotest::Eval::falsey -> { false }
@@ -234,6 +238,5 @@ Nanotest.run break_on_fail: true, prefix: "> " do
   before -> { puts "Starting Test..." }
 
   # Adding an after filter
-  after -> (success) { puts success ? "All good ♥" : "\nSomething went wrong :|" }
-  after -> (success) { raise RuntimeError unless success }
+  after -> (success) { puts success && "All good ♥" || nil }
 end

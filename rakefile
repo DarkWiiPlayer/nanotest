@@ -1,13 +1,22 @@
 task default: :install
 
 task :test do
+  puts
   abort unless system "ruby selftest.rb"
 end
 
-task build: :test do
+task :clean do
+  puts "\nCleaning directory..."
+  puts "Deleted #{File::delete *(Dir::glob "nanotest*.gem")} file(s)."
+end
+
+task build: [:test, :clean] do
+  puts
   abort unless system "gem build nanotest.gemspec"
 end
 
 task install: :build do
-  system "gem install nanotest*.gem"
+  puts
+  abort unless system "gem install nanotest*.gem"
+  puts "\nNanotest has been installed ♥"
 end

@@ -1,3 +1,5 @@
+class NanoTestFailed < StandardError; end
+
 class Nanotest
   def self.version
     return [0, 1, 2]
@@ -81,6 +83,9 @@ class Nanotest
     end
     @after.each { |step| step.call((failed==0),*args) }
     @failed = failed
+    raise NanoTestFailed,<<~EOM if opts :raise and failed>0
+      #{failed} test#{failed>1 ? 's did' : ' did'} not pass (see message#{ failed>1 ? 's' : nil } above)
+    EOM
     return failed
   end
 

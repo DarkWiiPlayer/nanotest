@@ -14,7 +14,6 @@ class Nanotest
       rescue StandardError => e
         return false
       end
-      return false
     end
   end
 end
