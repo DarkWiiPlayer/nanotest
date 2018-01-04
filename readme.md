@@ -141,7 +141,7 @@ end
 unless the `noraise` options is set to a truthy value, `maps` also succeeds of the function throws an error of the class provided instead of returning it.
 
 ```ruby
-div -> (x,y)-> do 
+div -> (x,y) do 
   raise ArgumentError if y==0
   x/y
 end
