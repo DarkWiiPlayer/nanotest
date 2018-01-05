@@ -130,15 +130,15 @@ Nanotest.run do
   add Nanotest::Eval::maps
     abs,
     {
-      [1] => 1
+      [ 1] => 1
       [-1] => 1
-      [0] => 0
+      [ 0] => 0
     },
     message: "Tests lambda to calculate absolute values"
 end
 ```
 
-unless the `noraise` options is set to a truthy value, `maps` also succeeds of the function throws an error of the class provided instead of returning it.
+unless the `:noraise` options is set to a truthy value, `maps` also succeeds of the function throws an error of the class provided instead of returning it.
 
 ```ruby
 div -> (x,y) do 
