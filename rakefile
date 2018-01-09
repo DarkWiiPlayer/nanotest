@@ -12,11 +12,15 @@ end
 
 task build: [:test, :clean] do
   puts
+  puts "Building Gem"
+  puts "============"
   abort unless system "gem build nanotest.gemspec"
 end
 
 task install: :build do
   puts
+  puts "Installing Gem"
+  puts "=============="
   abort unless system "gem install nanotest*.gem"
   puts "\nNanotest has been installed ♥"
 end

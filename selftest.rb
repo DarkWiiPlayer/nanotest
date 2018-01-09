@@ -1,12 +1,11 @@
 require_relative "lib/nanotest"
-require_relative "lib/nanotest/args"
 require_relative "lib/nanotest/eval"
 
 # First of all check the very basics are working
 
 raise "Something very basic is broken :(" if [
-  Nanotest.run(silent: true){ add -> { true } } < 1,
-  Nanotest.run(silent: true){ add -> { "Witchcraft" == "Works" } } > 0,
+  Nanotest.run(silent: true){ add -> { true } } <1,
+  Nanotest.run(silent: true){ add -> { "Witchcraft" == "Works" } } >0,
 ].any? { |e| !e }
 
 raise "Nanotest can't count :(" unless Nanotest.run(silent: true) {
@@ -33,23 +32,23 @@ Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
 
   # Adding Subtests
 
-  add "Test should fail when a subtest fails", -> do
+  add "Test should fail when a subtest fails (#{__LINE__})", -> do
     test = Nanotest.new silent: true
-    test.sub Nanotest.new(silent: true) { add -> { false } }
-    test.run > 0
+    test.add Nanotest.new(silent: true) { add -> { false } }
+    test.run >= 1
   end
 
-  add "Test should succeed when no subtest fails", -> do
+  add "Test should succeed when no subtest fails (#{__LINE__})", -> do
     test = Nanotest.new silent: true
-    test.sub Nanotest.new(silent: true) { add -> { true } }
-    test.run < 1
+    test.add Nanotest.new(silent: true) { add -> { true } }
+    test.run == 0
   end
 
-  add "Should pass arguments of `run` to Subtests", -> do
+  add "Should pass arguments of `run` to Subtests (#{__LINE__})", -> do
     arguments = [1, "hello", :world]
     t = Nanotest.new silent: true do
       s = Nanotest.new(silent: true) {add ->(*args) {args == arguments}}
-      sub s
+      add s
     end
     t.run *arguments
   end
@@ -68,7 +67,7 @@ Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
       return true
     end
   end
-  sub subtest
+  add subtest
 
   subtest = Nanotest.new(message: "Tests abort on fail behavior") do
     add "should break on fail", -> do
@@ -84,7 +83,7 @@ Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
       return true
     end
   end
-  sub subtest
+  add subtest
 
   add "Nanotest.run{} should pass aditional arguments", -> do
     (Nanotest.run({}, :hello, :world) do
@@ -92,7 +91,7 @@ Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
     end) == 0
   end
 
-  sub Nanotest.new(message: "Tests should throw when the :throw option is set and they fail", silent: true) {
+  add Nanotest.new(message: "Tests should throw when the :throw option is set and they fail", silent: true) {
     add Nanotest::Eval::fails -> do
       Nanotest.run(silent: true, raise: true) { add -> { false } }
     end, exception: NanoTestFailed
@@ -196,7 +195,7 @@ Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
 
   # Test result testing components
   
-  sub (Nanotest.new message: "Test Eval::maps (#{__FILE__}:#{__LINE__})", prefix: "maps> " do
+  add (Nanotest.new message: "Test Eval::maps (#{__FILE__}:#{__LINE__})", prefix: "maps> " do
     add({
       "Eval::maps should check if the function maps a series of value tuples to the corresponding results" => -> do
         (Nanotest.run silent: true do
@@ -238,5 +237,5 @@ Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
   before -> { puts "Starting Test..." }
 
   # Adding an after filter
-  after -> (success) { puts success && "All good ♥" || nil }
+  after -> (success) { puts success==0 && "All good ♥" || nil }
 end

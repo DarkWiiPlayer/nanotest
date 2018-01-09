@@ -1,7 +1,23 @@
-require_relative "common"
-
 class Nanotest
   module Eval
+    module Helper
+      def self.raises?(expr, except=nil, b=binding, *args)
+        except = except || StandardError
+        begin
+          if expr.is_a? String then
+            eval(expr, b)
+          else
+            expr.call(*args)
+          end
+          return false
+        rescue except => e
+          return e
+        rescue StandardError => e
+          return false
+        end
+      end
+    end
+
     def self.run expr, binding, *args
       if expr.is_a? Proc then
         return expr.(*args)
@@ -61,7 +77,7 @@ class Nanotest
       [
         message,
         lambda do |*args|
-          !Nanotest::Common::raises?(expr, opts[:exception], opts[:binding], *args)
+          !Helper::raises?(expr, opts[:exception], opts[:binding], *args)
         end,
       ]
     end
@@ -71,7 +87,7 @@ class Nanotest
       [
         message,
         lambda do |*args|
-          Nanotest::Common::raises?(expr, opts[:exception], opts[:binding], *args)
+          Helper::raises?(expr, opts[:exception], opts[:binding], *args)
         end ,
       ]
     end

@@ -10,8 +10,6 @@ Gem::Specification.new do |spec|
   spec.licenses = ["MIT"]
   spec.files = []
 	spec.files << "lib/nanotest.rb"
-	spec.files << "lib/nanotest/args.rb"
-	spec.files << "lib/nanotest/common.rb"
 	spec.files << "lib/nanotest/eval.rb"
 	spec.files << "selftest.rb"
   spec.files << "license.txt"

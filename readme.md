@@ -6,25 +6,32 @@ One of nanotests simplicity goals is that the entire core implementation fits on
 
 Introcuction
 ------------
-At the core of the library is the Nanotest class; which defines what a test looks like. A nanotest instance is a collection of subtests consisting of a message and a lambda.
+
+At the core of the library is the Nanotest class; which defines what a test looks like. A nanotest instance is a collection of subtests consisting of a message and a lambda. I will refer to these as *[test] atoms* or *atomic tests*, as they are are the smallest units defined by nanotest.
+
+This is the internal representation of an atom in the Nanotest class:
+
+```ruby
+atom = ["one plus one must be two", -> { 1+1==2 }]
+```
+
+So, from now on, *atom*: `(message, lambda)`
+
+### Success and Failure
 
 A test fails when the lambda returns a falsey value (`false` or `nil`) or a string containing a more detailed message.
 
-Before doing any actual programming, let's first check that the universe still makes sense:
+Before implementing any actual functionality, let's first check that the universe still makes sense:
 
 ```ruby
-world_test = Nanotest.new(message: "The world should make sense")
+world_test = Nanotest.new
 world_test.add "One equals one", lambda { return 1 == 1 }
 world_test.run
 ```
 
-If a test case fails with `nil` or `false`, its default message is printed; if it fails with a string, that string is printed instead. For any other return value, the test succeeds.
+As you can see, you add (atomic) tests with the `add` method.
 
-```ruby
-world_test.add "Magic should work", -> {"magic" == "works"}
-world_test.add "Earth should be flat", -> {"earth"=="flat" ? true : "No it's not"}
-```
-Both of the above tests fail; the first one prints "Magic should work", telling us what doesn't work, but not why. The second test prints "No it's not", letting us know not only what doesn't work, but giving us detailed insight into what exactly failed. Well, I guess it ultimately depends on the quality of the messages that the programmer defines.
+###Adding Tests
 
 The add method adds a test case to a nanotest object. It can take several formats of arguments, but they all come down to one or more pairs of a string and a lambda.
 
@@ -38,13 +45,39 @@ world_test.add {"message 1"=>->{true}, "message 2"=>->{true}}
 # Add iterates hashes and recursively calls add on each key,value pair
 ```
 
-As an alternative to the `add` method, Nanotest overloads the `<<` operator, allowing a single argument that is either a message+lambda test, or a subtest (another instance of Nanotest, more on this later) to be added.
+###Output
+
+If an atom fails with `nil` or `false`, its default message is printed; if it fails with a string, that string is printed instead. For any other return value, the test succeeds.
+
+If no default fail message is provided and the test fails with `nil` or `false`, nothing at all is printed (use this when you want to deal with the output elsewhere)
 
 ```ruby
-world_test << ["message", -> {true}]
+nanotest.run do
+  add -> { false } # this outputs nothing
+  add "default message", -> { false } # this outputs a default message
+  add "default message", -> { "custom message" } # this outputs a custom message
+end
 ```
 
-new{} and run{}
+```ruby
+big_test = nanotest.new do
+  add (nanotest.new message: "numbers must work" do
+    add -> { 1 == 1 }
+    add -> { 2 == 2 }
+  end)
+end
+# In this example we don't care wether it's `1` or `2` that fails,
+# so we don't output anything in the individual tests.
+# The containing test (more on subtests later) takes care of printing the message.
+```
+
+```ruby
+world_test.add "Magic should work", -> {"magic" == "works"}
+world_test.add "Earth should be flat", -> {"earth"=="flat" ? true : "No it's not"}
+```
+Both of the above tests fail; the first one prints "Magic should work", telling us what doesn't work, but not why. The second test prints "No it's not", letting us know not only what doesn't work, but giving us detailed insight into what exactly failed. Well, except it doesn't. In the end it comes down to the quality of the messages the developers write.
+
+new do... and run do...
 ------------
 To make defining tests on the fly easier, `Nanotest.new` and `Nanotest.run` both accept a block that is evaluated in the context of the new instance. `new` returns said instance, while `run` calls `run` on the new instance and returns its result.
 
@@ -74,18 +107,19 @@ Not repeating oneself is kind of a thing in programming, therefore Nanotest allo
 ```ruby
 supertest = Nanotest.new message: "Everything should be fine"
 supertest.add "Yes it is", -> { true }
-supertest.sub world_test # These two lines
-supertest << world_test  # Are equivalent
+supertest.add world_test
 ```
 
-*Anonymous subtests* can also be used; these are subtests that are created and directly added to a supertest to allow for a group of tests with different options (more on those later) or make it easier to possibly turn them into a full test case in the future.
+When a subtest has a `:message` option set, this string is automatically added as the fail message of the test that is added. Otherwise it is `nil` and output is expected to be handled elsewhere (either by the subtests own tests or further up or manually)
+
+Additional arguments to `add` are passed to the subtest followed by the arguments to the tests `run` method.
 
 ```ruby
-supertest = Nanotest.new(message: "My software should work")
-supertest.add Nanotest.new(message: "My math should work") do
-  add "addition", ->{1+1==2}
-  add "subtraction", ->{1-1==0}
-end
+big_test = Nanotest.new
+small_test = Nanotest.new
+small_test.add ->(*args) { args == [:add, :run] }
+big_test.add small_test, :add
+big_test.run(:run)
 ```
 
 Eval Module
@@ -95,7 +129,7 @@ Of course, with only the primitives mentioned above, creating tests for complex 
 ```ruby
 require "nanotest/eval"
 E = Nanotest::Eval
-Nanotest.run do # like new with block, but runs the test at the end
+Nanotest.run do
   add E::equal { return 100 }, "100"
   # Compares the results of two expressions
 end
@@ -122,7 +156,7 @@ Nanotest::Eval::fails(expr, opts={})
 Nanotest::eval::maps(expr, table, opts={})
 ```
 
-`maps` is possibly the most powerful function in the Eval module. It takes an expression and a map (known as hash in ruby-speek), and evaluates the function for each pair in the map with the values of the key (which should be an array) as arguments, and fails when the result differs from the corresponding value. As always, a hash can be passed as third argument for options.
+`maps` is possibly the most powerful function in the Eval module. It takes an expression and a map aka. hash, and evaluates the function for each pair in the map with the values of the key (which should be an array) as arguments, and fails when the result differs from the corresponding value. As always, an options hash can be passed as third argument.
 
 ```ruby
 abs = ->(x){x>=0 ? x : -x}
@@ -138,7 +172,7 @@ Nanotest.run do
 end
 ```
 
-unless the `:noraise` options is set to a truthy value, `maps` also succeeds of the function throws an error of the class provided instead of returning it.
+unless the `:noraise` options is set to a truthy value, `maps` also succeeds of the function throws an error of the class provided as if it was returning it.
 
 ```ruby
 div -> (x,y) do 
@@ -155,9 +189,6 @@ Nanotest.run do
   end
 end
 ```
-
-Args Module
-------------
 
 Before/After
 ------------
