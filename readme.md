@@ -53,18 +53,18 @@ If no default fail message is provided and the test fails with `nil` or `false`,
 
 ```ruby
 nanotest.run do
-  add -> { false } # this outputs nothing
-  add "default message", -> { false } # this outputs a default message
-  add "default message", -> { "custom message" } # this outputs a custom message
+	add -> { false } # this outputs nothing
+	add "default message", -> { false } # this outputs a default message
+	add "default message", -> { "custom message" } # this outputs a custom message
 end
 ```
 
 ```ruby
 big_test = nanotest.new do
-  add (nanotest.new message: "numbers must work" do
-    add -> { 1 == 1 }
-    add -> { 2 == 2 }
-  end)
+	add (nanotest.new message: "numbers must work" do
+		add -> { 1 == 1 }
+		add -> { 2 == 2 }
+	end)
 end
 # In this example we don't care wether it's `1` or `2` that fails,
 # so we don't output anything in the individual tests.
@@ -89,10 +89,10 @@ All arguments to the run() method are passed to each individual test. Therefore 
 
 ```ruby
 test_number = Nanotest.new do
-  add "Larger than 0",
-    -> (x, *rest) {x>0 ? true : "Number (#{x}) is <= 0"}
-  add "Smaller than 100",
-    -> (x, *rest) {x<100 ? true : "Number (#{x}) is >= 100"}
+	add "Larger than 0",
+		-> (x, *rest) {x>0 ? true : "Number (#{x}) is <= 0"}
+	add "Smaller than 100",
+		-> (x, *rest) {x<100 ? true : "Number (#{x}) is >= 100"}
 end
 test_number.run(5)
 test_number.run(8, 10000)
@@ -130,8 +130,8 @@ Of course, with only the primitives mentioned above, creating tests for complex 
 require "nanotest/eval"
 E = Nanotest::Eval
 Nanotest.run do
-  add E::equal { return 100 }, "100"
-  # Compares the results of two expressions
+	add E::equal { return 100 }, "100"
+	# Compares the results of two expressions
 end
 ```
 
@@ -161,12 +161,12 @@ add Nanotest::Eval::equal("20", "10+10", binding: [binding, binding])
 ```ruby
 add Nanotest::Eval::succeeds -> { 20 + 20 }
 add Nanotest::Eval::succeeds( # This test returns false; it fails
-  -> { raise ArgumentError },
-  exception: ArgumentError
+	-> { raise ArgumentError },
+	exception: ArgumentError
 )
 add Nanotest::Eval::succeeds( # This test doesn't rescue anything
-  -> { raise StandardError }, # the StandardError should be dealt
-  exception: ArgumentError    # with in Nanotest#run.
+	-> { raise StandardError }, # the StandardError should be dealt
+	exception: ArgumentError		# with in Nanotest#run.
 )
 ```
 
@@ -175,12 +175,12 @@ add Nanotest::Eval::succeeds( # This test doesn't rescue anything
 ```ruby
 add Nanotest::Eval::fails -> { raise "an error" }
 add Nanotest::Eval::fails( # This test succeeds, it raises the expected exception
-  -> { raise ArgumentError },
-  exception: ArgumentError
+	-> { raise ArgumentError },
+	exception: ArgumentError
 )
 add Nanotest::Eval::fails( # This test breaks, it raises an unexpected exception
-  -> { raise ArgumentError },
-  exception: RuntimeError
+	-> { raise ArgumentError },
+	exception: RuntimeError
 )
 ```
 
@@ -189,14 +189,14 @@ add Nanotest::Eval::fails( # This test breaks, it raises an unexpected exception
 ```ruby
 abs = ->(x){x>=0 ? x : -x}
 Nanotest.run do
-  add Nanotest::Eval::maps
-    abs,
-    {
-      [ 1] => 1
-      [-1] => 1
-      [ 0] => 0
-    },
-    message: "Tests lambda to calculate absolute values"
+	add Nanotest::Eval::maps
+		abs,
+		{
+			[ 1] => 1
+			[-1] => 1
+			[ 0] => 0
+		},
+		message: "Tests lambda to calculate absolute values"
 end
 ```
 
@@ -204,17 +204,17 @@ unless the `:noraise` options is set to a truthy value, `maps` also succeeds of 
 
 ```ruby
 div -> (x,y) do 
-  raise ArgumentError if y==0
-  x/y
+	raise ArgumentError if y==0
+	x/y
 end
 Nanotest.run do
-  add Nanotest::Eval::maps
-    div,
-    {
-      [1,1] => 1,
-      [1,0] => ArgumentError
-    }
-  end
+	add Nanotest::Eval::maps
+		div,
+		{
+			[1,1] => 1,
+			[1,0] => ArgumentError
+		}
+	end
 end
 ```
 
@@ -227,22 +227,22 @@ Add them with the `before` and `aftre` methods, passing a single lambda as argum
 
 ```ruby
 Nanotest.run(:some, :random, :arguments) do
-  after -> (f, *args_to_run) { puts "This happens at the end #{args_to_run}" }
-  before -> (*args_to_run) { puts "This happens first" }
+	after -> (f, *args_to_run) { puts "This happens at the end #{args_to_run}" }
+	before -> (*args_to_run) { puts "This happens first" }
 
-  add -> { puts "some test"; return true }
+	add -> { puts "some test"; return true }
 end
 ```
 
 ```ruby
-  # In some quick and dirty test
-  before -> { puts "Starting Tests" } # OK: you probably know there won't be any args
-  # In a large and reusable test
-  before -> (*_args) { puts "Starting test cases..." } # Good: avoids future headaches
-  # Regardless of where
-  after -> { puts "Tests finished" } # Bad: This raises an exception
-  after -> (*_args) { puts "Tests Finished" } # Good: This works
-  after -> (fails, *_) { puts "Success" if fails==0 } # Good: always works
+	# In some quick and dirty test
+	before -> { puts "Starting Tests" } # OK: you probably know there won't be any args
+	# In a large and reusable test
+	before -> (*_args) { puts "Starting test cases..." } # Good: avoids future headaches
+	# Regardless of where
+	after -> { puts "Tests finished" } # Bad: This raises an exception
+	after -> (*_args) { puts "Tests Finished" } # Good: This works
+	after -> (fails, *_) { puts "Success" if fails==0 } # Good: always works
 ```
 
 Options
@@ -272,9 +272,9 @@ Argumens. The answer is arguments. Imagine the following test:
 adder = ->(a,b) {a+b}
 ...
 test_adder = Nanotest.new(message: "A lambda should correctly add two numbers") begin
-  add "Should correctly add  1 + 1", -> {adder.call( 1,1) ==  2}
-  add "Should correctly add  0 + 1", -> {adder.call( 0,1) ==  1}
-  add "Should correctly add -1 + 0", -> {adder.call(-1,0) == -1}
+	add "Should correctly add  1 + 1", -> {adder.call( 1,1) ==	2}
+	add "Should correctly add  0 + 1", -> {adder.call( 0,1) ==	1}
+	add "Should correctly add -1 + 0", -> {adder.call(-1,0) == -1}
 end
 ```
 
@@ -283,8 +283,8 @@ This test only checks a single lambda, and the deterministic nature of the test 
 ```ruby
 ...
 test_adder_generic = Nanotest.new(message: "A lambda should add two numbers") begin
-  add "Should correctly add  1 + 1", ->(arg_adder){arg_adder.call(1,1) ==  2}
-  ...
+	add "Should correctly add  1 + 1", ->(arg_adder){arg_adder.call(1,1) ==  2}
+	...
 end
 ...
 ```
@@ -301,7 +301,7 @@ Like this; when running a test, any argument to the run method is passed to all 
 
 ```ruby
 Nanotest.new(message: "Test optimized code") do
-  sub test_adder_generic, optimized_adder_function
+	sub test_adder_generic, optimized_adder_function
 end
 ...
 # same for portable code
