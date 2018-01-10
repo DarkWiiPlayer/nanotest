@@ -1,3 +1,5 @@
+# vim: set noexpandtab:
+
 class Nanotest
   module Assert
     def self.compare(result, value)

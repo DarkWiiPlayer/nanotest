@@ -1,3 +1,5 @@
+# vim: set noexpandtab:
+
 class Nanotest
   def self.version
     return [0, 2, 0]

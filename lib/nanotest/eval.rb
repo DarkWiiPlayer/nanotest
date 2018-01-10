@@ -1,3 +1,5 @@
+# vim: set noexpandtab:
+
 class Nanotest
   module Eval
     module Helper
