@@ -160,16 +160,25 @@ Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
     end) == 1
   end
 
-  add "Eval::succeeds should detect the right exception (#{__FILE__}:#{__LINE__})", -> do
-    (Nanotest.run silent: true do
-      add Nanotest::Eval::succeeds(-> { raise ArgumentError }, exception: ArgumentError)
-    end) == 1
-  end
-  add "Eval::succeeds should not detect a different exception (#{__FILE__}:#{__LINE__})", -> do
-    (Nanotest.run silent: true do
-      add Nanotest::Eval::succeeds(-> { raise RuntimeError }, exception: ArgumentError)
-    end) == 0
-  end
+  add(Nanotest.new(prefix: "Eval::succeeds ") do
+    add("should succeed if nothing is raised.", lambda do
+      Nanotest::Eval::succeeds(lambda do
+        1 + 1 == 2
+      end)[1].call
+    end)
+    add("should fail if the 'expected' exception is raised.", lambda do
+      Nanotest::Eval::succeeds(lambda do
+        raise ArgumentError
+      end, exception: ArgumentError)[1].call == false
+    end)
+    add Nanotest::Eval::fails(lambda do
+      Nanotest::Eval::succeeds(lambda do
+        raise "It's the end of the world as we know it!"
+      end, exception: ArgumentError)[1].call == false
+    end,
+    message: "should not catch other exceptions and let core deal with them."
+    )
+  end)
 
   add "Eval::fails should succeed when an error is risen (#{__FILE__}:#{__LINE__})", -> do
     (Nanotest.run silent: true do
