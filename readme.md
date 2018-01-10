@@ -235,14 +235,14 @@ end
 ```
 
 ```ruby
-	# In some quick and dirty test
-	before -> { puts "Starting Tests" } # OK: you probably know there won't be any args
-	# In a large and reusable test
-	before -> (*_args) { puts "Starting test cases..." } # Good: avoids future headaches
-	# Regardless of where
-	after -> { puts "Tests finished" } # Bad: This raises an exception
-	after -> (*_args) { puts "Tests Finished" } # Good: This works
-	after -> (fails, *_) { puts "Success" if fails==0 } # Good: always works
+# In some quick and dirty test
+before -> { puts "Starting Tests" } # OK: you probably know there won't be any args
+# In a large and reusable test
+before -> (*_args) { puts "Starting test cases..." } # Good: avoids future headaches
+# Regardless of where
+after -> { puts "Tests finished" } # Bad: This raises an exception
+after -> (*_args) { puts "Tests Finished" } # Good: This works
+after -> (fails, *_) { puts "Success" if fails==0 } # Good: always works
 ```
 
 Options
