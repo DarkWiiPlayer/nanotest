@@ -51,8 +51,8 @@ class Nanotest
       [
         message,
         lambda do |*args|
-          res1 = run exp1, opts[:binding], *args
-          res2 = run exp2, opts[:binding], *args
+          res1 = run exp1, Array(opts[:binding]).first, *args
+          res2 = run exp2, Array(opts[:binding]).last,  *args
           res1==res2 || message + "\nExpected:\n#{res2.inspect}\nGot:\n#{res1.inspect}"
         end,
       ]
@@ -63,8 +63,8 @@ class Nanotest
       [
         message,
         lambda do |*args|
-          res1 = run exp1, opts[:binding], *args
-          res2 = run exp2, opts[:binding], *args
+          res1 = run exp1, Array(opts[:binding]).first, *args
+          res2 = run exp2, Array(opts[:binding]).last,  *args
           res1 != res2 || message + "\nBoth evaluate to\n#{res1}"
         end,
       ]
