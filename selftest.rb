@@ -188,27 +188,37 @@ Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
     )
   end)
 
-  add "Eval::fails should succeed when an error is risen (#{__FILE__}:#{__LINE__})", -> do
-    (Nanotest.run silent: true do
-      add Nanotest::Eval::fails -> { raise "Hello World" }
-    end) == 0
-  end
-  add "Eval::fails should fail when no error is risen (#{__FILE__}:#{__LINE__})", -> do
-    (Nanotest.run silent: true do
-      add Nanotest::Eval::fails -> { 1 + 1 == 2 }
-    end) == 1
-  end
+  add(Nanotest.new(prefix: "Eval::fails ") do
+    add("should succeed when an error is raised", lambda do
+      (Nanotest.run(silent: true) do
+        add Nanotest::Eval::fails -> { raise "Hello World" }
+      end) == 0
+    end)
 
-  add "Eval::fails should detect the right exception (#{__FILE__}:#{__LINE__})", -> do
-    (Nanotest.run silent: true do
-      add Nanotest::Eval::fails(-> { raise ArgumentError }, exception: ArgumentError)
-    end) == 0
-  end
-  add "Eval::fails should not detect a different exception (#{__FILE__}:#{__LINE__})", -> do
-    (Nanotest.run silent: true do
-      add Nanotest::Eval::fails(-> { raise RuntimeError }, exception: ArgumentError)
-    end) == 1
-  end
+    add("should fail when no error is raised", lambda do
+      (Nanotest.run(silent: true) do
+        add Nanotest::Eval::fails -> { 1 + 1 == 2 }
+      end) == 1
+    end)
+
+    add("should succeed when the right exception is raised", lambda do
+      (Nanotest.run(silent: true) do
+        add Nanotest::Eval::fails(
+          -> { raise ArgumentError },
+          exception: ArgumentError
+        )
+      end) == 0
+    end)
+
+    add("should fail when a wrong exception is raised", lambda do
+      (Nanotest.run(silent: true) do
+        add Nanotest::Eval::fails(
+          -> { raise ArgumentError },
+          exception: RuntimeError
+        )
+      end) == 1
+    end)
+  end)
 
   # Test result testing components
   
