@@ -2,36 +2,20 @@ Nanotest
 ============
 Nanotest is a minimalistic library for writing test cases in ruby. It was built with test driven development in mind, but tries to make no assumptions about the use case the tests are written for.
 
-One of nanotests simplicity goals is that the entire core implementation fits on my (rotated) screen in the font size I use during development. The main design filosophy is doing as much as possible with as little code and as little documentation as possible. One shouldn't have to spend hours learning a tool that doesn't get any work done by itself, like it's often the case with other testing frameworks that expect the user to learn an entire DSL for something that most of the time isn't even a part of the actual product, but a tool used to ensure its quality and *save time*.
+One of nanotests simplicity goals is that the entire core implementation fits on my (1080x1920px) screen in the font size I use during development. The main design filosophy is doing as much as possible with as little code and as little documentation as possible. One shouldn't have to spend hours learning a tool that doesn't get any work done by itself but only serves to ensure quality and *save time*.
 
 Introcuction
 ------------
 
-At the core of the library is the Nanotest class; which defines what a test looks like. A nanotest instance is a collection of subtests consisting of a message and a lambda. I will refer to these as *[test] atoms* or *atomic tests*, as they are are the smallest units defined by nanotest.
+At the core of the library is the Nanotest class which defines what a test looks like. A nanotest instance is a collection of subtests consisting of a message and a lambda. I will refer to these as *[test] atoms* or *atomic tests*, as they are are the smallest units defined by nanotest.
 
-This is the internal representation of an atom in the Nanotest class:
-
-```ruby
-atom = ["one plus one must be two", -> { 1+1==2 }]
-```
-
-So, from now on, *atom*: `(message, lambda)`
-
-### Success and Failure
-
-A test fails when the lambda returns a falsey value (`false` or `nil`) or a string containing a more detailed message.
-
-Before implementing any actual functionality, let's first check that the universe still makes sense:
+Internally, *atoms* are stored like this:
 
 ```ruby
-world_test = Nanotest.new
-world_test.add "One equals one", lambda { return 1 == 1 }
-world_test.run
+["one plus one must be two", -> { 1+1==2 }]
 ```
 
-As you can see, you add (atomic) tests with the `add` method.
-
-###Adding Tests
+### Adding Tests
 
 The add method adds a test case to a nanotest object. It can take several formats of arguments, but they all come down to one or more pairs of a string and a lambda.
 
@@ -45,7 +29,23 @@ world_test.add {"message 1"=>->{true}, "message 2"=>->{true}}
 # Add iterates hashes and recursively calls add on each key,value pair
 ```
 
-###Output
+### Success and Failure
+
+A test fails when the lambda returns a falsey value (`false` or `nil`) or a string containing a more detailed message.
+
+Before implementing any actual functionality, let's first check that the universe still makes sense:
+
+```ruby
+world_test = Nanotest.new
+world_test.add "One equals one", lambda { return 1 == 1 }
+world_test.run
+```
+
+If a test fails to rescue an error, it automatically fails, and nanotest will tell you about it. Such a test is considered *broken* because it did not deal with the exception, and presumably not expect it. This suggests either that the test itself needs fixing, or, more likely, that some other test needs to be run first.
+
+Normally tests should deal with __expected__ exceptions internally and fail (or succeed) when they are detected. Keep in mind though that tests should react to as few exceptions as possible, to avoid mistaking a broken test for a failing one.
+
+### Output
 
 If an atom fails with `nil` or `false`, its default message is printed; if it fails with a string, that string is printed instead. For any other return value, the test succeeds.
 
@@ -135,28 +135,56 @@ Nanotest.run do
 end
 ```
 
-Other factory functions in the Eval module are:
+All of the factories in the eval module accept an optional hash of named parameters.
 
-```
-Nanotest::Eval::Truthy(expr, opts={})
-# Fails unless `expr` evaluates to a truthy value
-# Valid options:
-# * :binding => <binding>
-# * :message => string (a custom description of the test)
-Nanotest::Eval::Falsey(expr, opts={})
-# Fails if `expr` evaluates to a truthy value
-Nanotest::Eval::equal(exp1, exp2, opts={})
-# Fails unless both expressions evaluate to the same value
-Nanotest::Eval::unequal(exp1, exp2, opts={})
-# Fails if both expressions evaluate to the same value
-Nanotest::Eval::succeeds(expr, opts={})
-# Fails if `expr` throws an error
-Nanotest::Eval::fails(expr, opts={})
-# Fails *unless* `expr` throws an error
-Nanotest::eval::maps(expr, table, opts={})
+They all share the `:message` and `:binding` option, with the first being used to override the default fail message and the second to provide a binding in case the expression to evaluate is a string. Factories that evaluate two expressions can take boh a single binding or an array of bindings.
+
+`truthy` evaluates a given block or expression and returns `true` if it evaluated to a truthy value and `false` otherwise
+
+```ruby
+add Nanotest::Eval::truthy(-> { true })
+add Nanotest::Eval::truthy(-> { true }, message: "Truth shall be truthy")
+add Nanotest::Eval::truthy("true", binding: binding)
 ```
 
-`maps` is possibly the most powerful function in the Eval module. It takes an expression and a map aka. hash, and evaluates the function for each pair in the map with the values of the key (which should be an array) as arguments, and fails when the result differs from the corresponding value. As always, an options hash can be passed as third argument.
+`falsey` works like `truthy`, but does the opposite
+
+`equal` and `unequal` both evaluate two expressions or blocks and return wether they are equal or unequal respectively. If an array of bindings is provided, its first and last elements are used.
+
+```ruby
+add Nanotest::Eval::equal(->{20}, ->{10+10})
+add Nanotest::Eval::equal("20", "10+10", binding: [binding, binding])
+```
+
+`succeeds` takes a block/expression and optionally an exception class (passed as the `:exception` option, default is `StandardError`), evaluates the expression and returns true if nothing is raised or false if the expected expression is raised. Other exceptions are not rescued and left to the nanotest core to deal with.
+
+```ruby
+add Nanotest::Eval::succeeds -> { 20 + 20 }
+add Nanotest::Eval::succeeds( # This test returns false; it fails
+  -> { raise ArgumentError },
+  exception: ArgumentError
+)
+add Nanotest::Eval::succeeds( # This test doesn't rescue anything
+  -> { raise StandardError }, # the StandardError should be dealt
+  exception: ArgumentError    # with in Nanotest#run.
+)
+```
+
+`fails` takes a block/expression and an optional exception class, evaluates it, and only succeeds if it raises an exception of the expected class. Other exceptions are not rescued and if nothing is raised it returns false.
+
+```ruby
+add Nanotest::Eval::fails -> { raise "an error" }
+add Nanotest::Eval::fails( # This test succeeds, it raises the expected exception
+  -> { raise ArgumentError },
+  exception: ArgumentError
+)
+add Nanotest::Eval::fails( # This test breaks, it raises an unexpected exception
+  -> { raise ArgumentError },
+  exception: RuntimeError
+)
+```
+
+`maps` is possibly the most powerful function in the Eval module. It takes an expression and a map (aka. hash), and evaluates the function for each pair in the map with the values of the key (which should be an array) as arguments, and fails when the result differs from the corresponding value.
 
 ```ruby
 abs = ->(x){x>=0 ? x : -x}
@@ -193,8 +221,42 @@ end
 Before/After
 ------------
 
+For setup/cleanup and output you can add before- and after-actions.
+
+Add them with the `before` and `aftre` methods, passing a single lambda as argument. Note though that this lambda is passed all arguments of Nanotest#run in the case of `before` and aditionally the number of failed tests before it in case of `after. This means that the lambdas should deal with optional arguments to keep the test generic and all after-actions need to take at least one argument.
+
+```ruby
+Nanotest.run(:some, :random, :arguments) do
+  after -> (f, *args_to_run) { puts "This happens at the end #{args_to_run}" }
+  before -> (*args_to_run) { puts "This happens first" }
+
+  add -> { puts "some test"; return true }
+end
+```
+
+```ruby
+  # In some quick and dirty test
+  before -> { puts "Starting Tests" } # OK: you probably know there won't be any args
+  # In a large and reusable test
+  before -> (*_args) { puts "Starting test cases..." } # Good: avoids future headaches
+  # Regardless of where
+  after -> { puts "Tests finished" } # Bad: This raises an exception
+  after -> (*_args) { puts "Tests Finished" } # Good: This works
+  after -> (fails, *_) { puts "Success" if fails==0 } # Good: always works
+```
+
 Options
 ------------
+
+Nanotest#new can take an optional hash of named parameters. Here's a list of the possible parameters:
+
+* verbose: boolean # More output, tells you about passing tests as well, etc.
+* notify_pass: boolean # Also informs you of passing tests
+* silent: boolean # No output at all
+* break_on_fail: boolean # Breaks after the first test has failed, runs after-actions
+* abort_on_fail: boolean # Aborts after the first test has failed, skips after-actions
+* raise: boolean # Raises a NanoTestFailed exception when any test has failed (combine with break_on_fail to raise instantly)
+* random: boolean # shuffles the order of the tests
 
 Advanced Uses
 ====================
