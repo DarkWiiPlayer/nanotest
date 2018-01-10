@@ -14,6 +14,14 @@ raise "Nanotest can't count :(" unless Nanotest.run(silent: true) {
   }
 } == 7
 
+begin
+  raise NanoTestFailed, "Broken tests aren't counted as failed" if (Nanotest.run silent: true do
+    add -> { raise "an error" }
+  end) != 1
+rescue RuntimeError => e
+  raise "Nanotest doesn't catch exceptions right!"
+end
+
 Nanotest.run break_on_fail: true, raise: true, prefix: "> " do
   add "Adding tests should work correctly", -> do
     t = Nanotest.new silent: true do
