@@ -27,7 +27,7 @@ class Nanotest
       sub = -> (*largs) { arg.run(*args, *largs) == 0 }
       add arg.message && [arg.message, sub] || sub
     elsif arg.is_a? Proc then # -> lambda
-      @tests << [nil, arg]
+      @tests << [(opts :verbose) ? "Unnamed test case" : nil, arg]
     elsif arg.is_a? Array then # [message, -> lambda]
       add Hash[*arg.flatten]
     elsif arg.is_a? Hash then # {message => -> lambda}
@@ -57,7 +57,8 @@ class Nanotest
         result =
           "#{test[0]}\nTest threw an exception (#{e.class}):\n" +
           " -> #{e.message}\nBacktrace:\n" +
-          "#{e.backtrace.reverse.join "\n" }"
+          "#{e.backtrace.reverse.join "\n" }" +
+          "...this means your test is broken, go fix it!"
       end
       if result and not result.is_a? String then
         notify(test[0],true,i) if opts :notify_pass, :verbose
