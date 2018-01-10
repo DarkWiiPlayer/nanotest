@@ -21,17 +21,17 @@ class Nanotest
   end
 
   def add(arg, *args)
-    if arg.is_a? String and args[0].is_a? Proc then
+    if arg.is_a? String and args[0].is_a? Proc then # message, -> lambda
       @tests << [arg, args[0]]
-    elsif arg.is_a? self.class then
+    elsif arg.is_a? self.class then # subtest
       sub = -> (*largs) { arg.run(*args, *largs) == 0 }
       add arg.message && [arg.message, sub] || sub
-    elsif arg.is_a? Proc then
+    elsif arg.is_a? Proc then # -> lambda
       @tests << [nil, arg]
-    elsif arg.is_a? Array then
+    elsif arg.is_a? Array then # [message, -> lambda]
       add Hash[*arg.flatten]
-    elsif arg.is_a? Hash then
-      arg.each { |key, value| add key, value}
+    elsif arg.is_a? Hash then # {message => -> lambda}
+      arg.each { |key, value| add key, value }
     else
       raise ArgumentError, "Wrong arguments provided: [#{arg.class}, #{test.class}]"
     end
@@ -54,15 +54,16 @@ class Nanotest
       begin
         result = test[1].call(*args)
       rescue StandardError => e
-        result = "#{test[0]}\nTest threw an exception:\n"+
-        " -> #{e.message}\nBacktrace:\n"+
-        "#{e.backtrace.reverse.join "\n" }"
+        result =
+          "#{test[0]}\nTest threw an exception (#{e.class}):\n" +
+          " -> #{e.message}\nBacktrace:\n" +
+          "#{e.backtrace.reverse.join "\n" }"
       end
       if result and not result.is_a? String then
         notify(test[0],true,i) if opts :notify_pass, :verbose
       else
         notify(result || test[0],false,i) if (result or test[0]) and not opts :silent
-        failed = failed + 1
+        failed += 1
         return true if opts :abort_on_fail
         break if opts :break_on_fail
       end
