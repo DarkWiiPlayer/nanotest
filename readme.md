@@ -1,3 +1,7 @@
+## WARNING
+
+As of version 0.3.0 most stuff also accepts blocks instead of lambda, but this readme file doesn't reflect those changes yet.
+
 Nanotest
 ============
 Nanotest is a minimalistic library for writing test cases in ruby. It was built with test driven development in mind, but tries to make no assumptions about the use case the tests are written for.
