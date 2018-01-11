@@ -180,17 +180,6 @@ Nanotest.run(break_on_fail: true, raise: true, prefix: "> ") do
 
 	# Test exception testing components
 
-	add "Eval::succeeds should succeed when no error is risen (#{__FILE__}:#{__LINE__})", -> do
-		(Nanotest.run silent: true do
-			add Nanotest::Eval::succeeds -> { return 1 + 1 }
-		end) == 0
-	end
-	add "Eval::succeeds should fail when an error is risen (#{__FILE__}:#{__LINE__})", -> do
-		(Nanotest.run silent: true do
-			add Nanotest::Eval::succeeds -> { raise "Hello World" }
-		end) == 1
-	end
-
 	add(Nanotest.new(prefix: "Eval::succeeds ") do
 		add("should succeed if nothing is raised.", lambda do
 			Nanotest::Eval::succeeds(lambda do
