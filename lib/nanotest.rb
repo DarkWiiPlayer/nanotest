@@ -1,7 +1,7 @@
 # vim: set noexpandtab:
 class Nanotest
 	def self.version
-		return [0, 3, 0]
+		return [0, 3, 1]
 	end
 
 	def self.run(opts={}, *args, &block)

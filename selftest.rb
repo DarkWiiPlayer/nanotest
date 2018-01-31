@@ -283,6 +283,10 @@ Nanotest.run(break_on_fail: true, raise: true, prefix: "> ") do
 		add "deal with non-array arguments" do
 			not Nanotest::Eval::maps({:a=>:a}, ->(a){a})[1].call().is_a?(String)
 		end
+
+		add "use a name if one is given" do
+			not Nanotest::Eval::maps({:a=>:b}, ->(a){a}, name: "yo mama")[1].call().match("yo mama").nil?
+		end
 	end)
 
 	# Adding a before filter

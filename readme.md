@@ -220,6 +220,8 @@ add Nanotest::Eval::fails( # This test breaks, it raises an unexpected exception
 
 \* Note that the argument (key in the hash) doesn't need to be an array; everything other than an array will be passed as a single argument. Just be sure not to get confused when passing an array as single argument; in this case the array needs to be itself inside an array, or its elements will be passed as single arguments.
 
+`maps` now supports name-calling. Supply a `:name` option for more precise output. (the other `eval` functions will get this functionality as well in the near future)
+
 ```ruby
 abs = ->(x){x>=0 ? x : -x}
 Nanotest.run do

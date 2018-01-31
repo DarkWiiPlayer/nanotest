@@ -118,7 +118,7 @@ class Nanotest
 			raise ArgumentError, <<~ERROR unless expr.respond_to?(:call) or expr.is_a? String
 				Expression is #{expr.class}, expected Proc/Method or String
 			ERROR
-			message = opts[:message] || "`#{expr}` should evaluate each key to its corresponding value."
+			message = opts[:message] || "`#{opts[:name] || expr}` should evaluate each key to its corresponding value."
 			[
 				message,
 				lambda do |*_|
