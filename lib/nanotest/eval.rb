@@ -112,7 +112,6 @@ class Nanotest
 			]
 		end
 
-		# FIXME
 		def self.maps(table, expr=nil, opts={}, &block)
 			opts = expr if expr.is_a?(Hash)
 			expr = block if block.respond_to?(:call)
@@ -131,7 +130,7 @@ class Nanotest
 							result = e.class
 						end
 						unless result == value
-							return message+"\nIncorrectly mapped\n#{args.join(", ")}\nto\n#{result}\nexpected\n#{value}"
+							return message+"\nIncorrectly mapped\n#{Array(args).join(", ")}\nto\n#{result}\nexpected\n#{value}"
 						end
 					end
 					return true

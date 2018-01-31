@@ -276,6 +276,13 @@ Nanotest.run(break_on_fail: true, raise: true, prefix: "> ") do
 				Nanotest::Eval::maps({[1]=>3}){ |x| x+1 }[1].call.is_a? String
 			end
 		})
+		add(Nanotest::Eval::succeeds(message: "not crash when mapping non-array to value") do
+			Nanotest::Eval::maps({:a=>:a}, ->(a){a})[1].call()
+		end)
+
+		add "deal with non-array arguments" do
+			not Nanotest::Eval::maps({:a=>:a}, ->(a){a})[1].call().is_a?(String)
+		end
 	end)
 
 	# Adding a before filter

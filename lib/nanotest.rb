@@ -13,22 +13,22 @@ class Nanotest
 		@before = []
 		@after = []
 		@opts = opts
-		self.instance_eval &block if block
+		self.instance_eval(&block) if block
 	end
 
 	def add(arg=nil, *args, &block)
 		if block then
 			arg.is_a?(String) && add(arg, block) || add(block)
-		elsif arg.is_a? String and args[0].is_a? Proc then
+		elsif arg.is_a?(String) and args[0].is_a?(Proc) then
 			@tests << [arg, args[0]]
 		elsif arg.is_a? self.class then
 			sub = -> (*largs) { arg.run(*args, *largs) == 0 }
 			add arg.message && [arg.message, sub] || sub
-		elsif arg.is_a? Proc then
+		elsif arg.is_a?(Proc) then
 			@tests << [(opts :verbose) ? "Unnamed test case" : nil, arg]
-		elsif arg.is_a? Array then
+		elsif arg.is_a?(Array) then
 			add Hash[*arg.flatten]
-		elsif arg.is_a? Hash then
+		elsif arg.is_a?(Hash) then
 			arg.each { |key, value| add key, value }
 		else
 			raise ArgumentError, "Wrong arguments provided: [#{[arg.class] + args.map { |e| e.class }}]"
@@ -58,7 +58,7 @@ class Nanotest
 					"#{e.backtrace.join "\n" }" +
 					"\n...this means your test is broken, go fix it!"
 			end
-			if result and not result.is_a? String then
+			if result and not result.is_a?(String) then
 				notify(test[0],true,i) if opts :notify_pass, :verbose
 			else
 				notify(result || test[0],false,i) if (result or test[0]) and not opts :silent
