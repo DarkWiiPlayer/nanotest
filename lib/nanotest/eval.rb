@@ -18,7 +18,7 @@ class Nanotest
 			end
 
 			def self.run expr, binding, *args
-				if expr.is_a? Proc then
+				if expr.respond_to?(:call) then
 					return expr.(*args)
 				else
 					return eval expr, binding
@@ -28,8 +28,8 @@ class Nanotest
 
 		def self.truthy(expr=nil, opts={}, &block)
 			opts = expr if expr.is_a?(Hash)
-			expr = block if block.is_a? Proc
-			raise ArgumentError, <<~ERROR unless expr.is_a? Proc or expr.is_a? String
+			expr = block if block.respond_to?(:call)
+			raise ArgumentError, <<~ERROR unless expr.respond_to?(:call) or expr.is_a? String
 				Expression is #{expr.class}, expected Proc or String
 			ERROR
 			message = opts[:message].to_s + "#{opts[:message] ? "\n" : nil}Expect `#{expr}` to be truthy"
@@ -44,8 +44,8 @@ class Nanotest
 
 		def self.falsey(expr=nil, opts={}, &block)
 			opts = expr if expr.is_a?(Hash)
-			expr = block if block.is_a? Proc
-			raise ArgumentError, <<~ERROR unless expr.is_a? Proc or expr.is_a? String
+			expr = block if block.respond_to?(:call)
+			raise ArgumentError, <<~ERROR unless expr.respond_to?(:call) or expr.is_a? String
 				Expression is #{expr.class}, expected Proc or String
 			ERROR
 			message = opts[:message].to_s + "#{opts[:message] ? "\n" : nil}Expect `#{expr}` to be falsey"
@@ -84,8 +84,8 @@ class Nanotest
 
 		def self.succeeds(expr=nil, opts={}, &block)
 			opts = expr if expr.is_a?(Hash)
-			expr = block if block.is_a? Proc
-			raise ArgumentError, <<~ERROR unless expr.is_a? Proc or expr.is_a? String
+			expr = block if block.respond_to?(:call)
+			raise ArgumentError, <<~ERROR unless expr.respond_to?(:call) or expr.is_a? String
 				Expression is #{expr.class}, expected Proc or String
 			ERROR
 			message = opts[:message] || "Expression '#{expr}' should succeed without errors"
@@ -99,8 +99,8 @@ class Nanotest
 
 		def self.fails(expr=nil, opts={}, &block)
 			opts = expr if expr.is_a?(Hash)
-			expr = block if block.is_a? Proc
-			raise ArgumentError, <<~ERROR unless expr.is_a? Proc or expr.is_a? String
+			expr = block if block.respond_to?(:call)
+			raise ArgumentError, <<~ERROR unless expr.respond_to?(:call) or expr.is_a? String
 				Expression is #{expr.class}, expected Proc or String
 			ERROR
 			message = opts[:message] || "'Expression #{expr}' should fail with an error"
@@ -115,9 +115,9 @@ class Nanotest
 		# FIXME
 		def self.maps(table, expr=nil, opts={}, &block)
 			opts = expr if expr.is_a?(Hash)
-			expr = block if block.is_a? Proc
-			raise ArgumentError, <<~ERROR unless expr.is_a? Proc or expr.is_a? String
-				Expression is #{expr.class}, expected Proc or String
+			expr = block if block.respond_to?(:call)
+			raise ArgumentError, <<~ERROR unless expr.respond_to?(:call) or expr.is_a? String
+				Expression is #{expr.class}, expected Proc/Method or String
 			ERROR
 			message = opts[:message] || "`#{expr}` should evaluate each key to its corresponding value."
 			[
