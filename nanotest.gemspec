@@ -11,6 +11,7 @@ Gem::Specification.new do |spec|
   spec.files = []
 	spec.files << "lib/nanotest.rb"
 	spec.files << "lib/nanotest/eval.rb"
+	spec.files << "lib/nanotest/syntax.rb"
   spec.files << "license.txt"
 	
   spec.require_paths = ["lib"]
