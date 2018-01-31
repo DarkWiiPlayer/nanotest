@@ -1,5 +1,13 @@
 # vim: set noexpandtab:
 
+# Test that the files are ok
+if [ # TODO: Make this into a test module
+	system("ruby -wc lib/nanotest.rb"),
+	system("ruby -wc lib/nanotest/eval.rb"),
+].any? { |e| !e } then
+	raise "Some of the ruby files isn't okay :|"
+end
+
 require_relative "lib/nanotest"
 require_relative "lib/nanotest/eval"
 
