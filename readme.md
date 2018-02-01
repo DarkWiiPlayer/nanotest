@@ -168,6 +168,8 @@ All of the factories in the eval module accept an optional hash of named paramet
 
 They all share the `:message` and `:binding` option, with the first being used to override the default fail message and the second to provide a binding in case the expression to evaluate is a string. Factories that evaluate more than one expression can take both a single binding or an array of bindings.
 
+They also accept a `:name` option, or in case they have more than one subject, `:name_1`, `:name_2`, ... `:name_n`. This will improve the quality of the output as the test will know what to call the subjects.
+
 Here are all the functions that are available thus far:
 
 `truthy` evaluates a given block or expression and returns `true` if it evaluated to a truthy value and `false` otherwise
@@ -219,8 +221,6 @@ add Nanotest::Eval::fails( # This test breaks, it raises an unexpected exception
 `maps` is possibly the most powerful function in the Eval module. It takes an expression and a map (aka. hash), and evaluates the function for each pair in the map with the values of the key (which should be an array\*) as arguments, and fails when the result differs from the corresponding value.
 
 \* Note that the argument (key in the hash) doesn't need to be an array; everything other than an array will be passed as a single argument. Just be sure not to get confused when passing an array as single argument; in this case the array needs to be itself inside an array, or its elements will be passed as single arguments.
-
-`maps` now supports name-calling. Supply a `:name` option for more precise output. (the other `eval` functions will get this functionality as well in the near future)
 
 ```ruby
 abs = ->(x){x>=0 ? x : -x}
