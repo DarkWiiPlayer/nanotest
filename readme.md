@@ -98,6 +98,13 @@ Nanotest#new can take an optional hash of named parameters. Here's a list of the
 * raise: boolean # Raises a NanoTestFailed exception when any test has failed (combine with break_on_fail to raise instantly)
 * random: boolean # shuffles the order of the tests
 
+Options can be changed after creating a test with the `setop` method in the same way:
+
+```ruby
+test = Nanotest.new(raise: true)
+test.setop(raise: false)
+```
+
 new do... and run do...
 ------------
 To make defining tests on the fly easier, `Nanotest.new` and `Nanotest.run` both accept a block that is evaluated in the context of the new instance. `new` returns said instance, while `run` calls `run` on the new instance and returns its result.

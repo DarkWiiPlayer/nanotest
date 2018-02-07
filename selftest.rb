@@ -33,6 +33,13 @@ rescue RuntimeError => e
 end
 
 Nanotest.run(break_on_fail: true, raise: true, prefix: "> ") do
+	add(Nanotest::Eval::succeeds(message: "Setting options should work") do
+		test = Nanotest.new(raise: true)
+		test.setop(raise: false)
+		test.add { false }
+		test.run
+	end)
+
 	add("Adding tests should work correctly") do
 		t = Nanotest.new(silent: true) do
 			add { true }

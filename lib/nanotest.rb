@@ -1,4 +1,4 @@
-# vim: set noexpandtab:
+# vim: set noexpandtab list:
 class Nanotest
 	def self.version
 		return [0, 3, 2]
@@ -76,12 +76,13 @@ class Nanotest
 
 	def message() @opts[:message] end
 
+	def opts(*args) args.empty? ? opts.dup.freeze : args.any? { |arg| @opts[arg] } end
+	def setop(opts={}) opts.each { |k,v| @opts[k]=v } end
+
 	private
 
 	def notify(msg, pass, i=0)
 		puts "#{@opts[:line_start]}Test #{pass ? "passed" : "failed"}: #{@opts[:prefix]}#{msg}"
 	end
-
-	def opts(*args) args.any? { |arg| @opts[arg] } end
 end
 class NanoTestFailed < StandardError; end
