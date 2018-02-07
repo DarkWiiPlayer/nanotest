@@ -118,24 +118,51 @@ class Nanotest
 			raise ArgumentError, <<~ERROR unless subject.respond_to?(:call) or subject.is_a? String
 				Subject is #{subject.class}, expected Proc/Method or String
 			ERROR
-			message = opts[:message] || "`#{opts[:name] || subject}` should evaluate each key to its corresponding value."
-			[
-				message,
-				lambda do |*_|
-					table.each do |args, value|
-						begin
-							result = Helper::run(subject, opts[:binding], *args)
-						rescue Exception => e
-							raise e if opts[:noraise]
-							result = e.class
+			if opts[:split] then
+				table.each.each_with_object([]) do |args_value, subtests|
+					args, value = args_value
+					message = opts[:message] ||
+						"`#{opts[:name] || subject}` should map\n`#{args.inspect}` => `#{value.inspect}`"
+					subtests << [ message,
+						proc do
+							begin
+								result = Helper::run(subject, opts[:binding], *args)
+							rescue Exception => e
+								raise e if opts[:noraise]
+								result = e.class
+							end
+							if result == value
+								true
+							else
+								message+"\nbut mapped it to `#{result.inspect}` instead"
+							end
 						end
-						unless result == value
-							return message+"\nIncorrectly mapped\n#{Array(args).join(", ")}\nto\n#{result}\nexpected\n#{value}"
-						end
-					end
-					return true
+					]
 				end
-			]
-		end
+			else
+				message = opts[:message] || "`#{opts[:name] || subject}` should evaluate each key to its corresponding value."
+				[ message,
+					lambda do |*_|
+						table.each do |args, value|
+							begin
+								result = Helper::run(subject, opts[:binding], *args)
+							rescue Exception => e
+								raise e if opts[:noraise]
+								result = e.class
+							end
+							unless result == value
+								return message+"\n"+<<~EOL
+								Incorrectly mapped
+								\t#{Array(args).map(&:inspect).join(", ")} to
+								\t#{result.inspect} (#{result.class}), expected
+								\t#{value.inspect} (#{value.class})
+								EOL
+							end
+						end
+						return true
+					end
+				]
+			end # if-else opts[:split]
+		end # def maps
 	end
 end

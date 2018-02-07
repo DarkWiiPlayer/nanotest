@@ -231,6 +231,8 @@ add Nanotest::Eval::fails( # This test breaks, it raises an unexpected exception
 
 `maps` is possibly the most powerful function in the Eval module. It takes an expression and a map (aka. hash), and evaluates the function for each pair in the map with the values of the key (which should be an array\*) as arguments, and fails when the result differs from the corresponding value.
 
+If the `:split` option is set, `maps` will return an array of tests, one for each arguments-result pair, instead of a single test that iterates them all in a loop. This is useful when you want all tests to be executed, even if a previous one failed.
+
 \* Note that the argument (key in the hash) doesn't need to be an array; everything other than an array will be passed as a single argument. Just be sure not to get confused when passing an array as single argument; in this case the array needs to be itself inside an array, or its elements will be passed as single arguments.
 
 ```ruby

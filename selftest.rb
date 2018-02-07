@@ -257,10 +257,16 @@ Nanotest.run(break_on_fail: true, raise: true, prefix: "> ") do
 
 	# Test result testing components
 	
-	add (Nanotest.new(
-		prefix: "Eval::maps should ",
-		break_on_fail: true
-	) do
+	add "Eval::maps should return a single test" do
+		Nanotest::Eval::maps({:a => :a}, ->(x){ :a })[1].respond_to? :call
+	end
+
+	add "Eval::maps should return individual tests if :split is set" do
+		maps_test = Nanotest::Eval::maps({:a => :a}, ->(x){ :a }, split: true)
+		maps_test.all? { |test| test[1].respond_to? :call }
+	end
+	
+	add (Nanotest.new( prefix: "Eval::maps should ", break_on_fail: true) do
 		add({
 			"succeed if a lambda maps a series of value tuples to the corresponding results" => lambda do
 				Nanotest::Eval::maps(
