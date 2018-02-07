@@ -118,6 +118,10 @@ end # Runs automatically and succeeds
 
 `Nanotest.run` takes the same arguments as `new`, and passes all extra arguments to the `run` instance method.
 
+Try
+------------
+Try works pretty much like run, except that it returns `true` when all tests succeed, that is, the result of `run` is 0, and `false` otherwise
+
 Arguments
 ------------
 All arguments to the run() method are passed to each individual test. Therefore it is recommended to write lambda test expressions as `-> (*args) {...}` when they are meant to ignore possible additional arguments for the sake of reusability. In most cases inline test expressions should be passed as a block, so aditional arguments would just be ignored.

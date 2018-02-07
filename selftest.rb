@@ -40,6 +40,14 @@ Nanotest.run(break_on_fail: true, raise: true, prefix: "> ") do
 		test.run
 	end)
 
+	add "try should return true if nothing fails" do
+		Nanotest.try { add { true } }
+	end
+
+	add "try should return false if something fails" do
+		!Nanotest.try { add { false } }
+	end
+
 	add("Adding tests should work correctly") do
 		t = Nanotest.new(silent: true) do
 			add { true }

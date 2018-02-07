@@ -1,12 +1,13 @@
 # vim: set noexpandtab list:
 class Nanotest
 	def self.version
-		return [0, 3, 2]
+		return [0, 3, 3]
 	end
 
 	def self.run(opts={}, *args, &block)
 		new(opts, &block).run(*args)
 	end
+	def self.try(*args, &block) run(*args, &block)==0 end
 
 	def initialize(opts={}, &block)
 		@tests = []
@@ -73,6 +74,7 @@ class Nanotest
 		EOM
 		return failed
 	end
+	def try(*args) run(*args)==0 end
 
 	def message() @opts[:message] end
 
