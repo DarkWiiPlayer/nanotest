@@ -1,13 +1,15 @@
-Nanotest ![](https://travis-ci.org/DarkWiiPlayer/nanotest.svg?branch=master)
+Numidium
 ============
-Nanotest is a minimalistic library for writing test cases in ruby. It was built with test driven development in mind, but tries to make no assumptions about the use case the tests are written for.
+Numidium is a minimalistic library for writing test cases in ruby. It was built with test driven development in mind, but tries to make no assumptions about the use case the tests are written for.
 
 One of nanotests simplicity goals is that the entire core implementation fits on my (1080x1920px) screen in the font size I use during development. The main design filosophy is doing as much as possible with as little code and as little documentation as possible. One shouldn't have to spend hours learning a tool that doesn't get any work done by itself but only serves to ensure quality and *save time*.
+
+Note: Numidium was called Nanotest once, but then I found out there's what feels like a few thousand other gems with that name, so I renamed it to Numidium because 1) it also starts with N 2) has the same number of letters and 3) elder scrolls is awesome
 
 Introcuction
 ------------
 
-At the core of the library is the Nanotest class which defines what a test looks like. In a more abstract context, I refer to this as the nanotest *core*. A nanotest instance is a collection of subtests consisting of a message and a lambda. I will refer to these as *[test] atoms* or *atomic tests*, as they are are the smallest units defined by nanotest.
+At the core of the library is the Numidium class which defines what a test looks like. In a more abstract context, I refer to this as the nanotest *core*. A nanotest instance is a collection of subtests consisting of a message and a lambda. I will refer to these as *[test] atoms* or *atomic tests*, as they are are the smallest units defined by nanotest.
 
 Internally, *atoms* are stored like this:
 
@@ -20,11 +22,11 @@ Internally, *atoms* are stored like this:
 The add method adds a test case to a nanotest object. It can take several formats of arguments, but they all come down to one or more pairs of a string and a lambda. The main way to add a subtest is this though:
 
 ```ruby
-world_test = Nanotest.new
+world_test = Numidium.new
 world_test.add("description of the test") { something == something_else }
 ```
 
-The string argument describes the meaning of the test, and would usually look something like this *"divide_numbers should raise ArgumentError when divisor is 0"*. The block defines how the described behavior is to be tested and should return a boolean in most cases (more on this in the next section). There are a few other ways to add tests which aren't as much meant to be used literally, but when working with factory functions that generate complex tests from a few parameters like the `Nanotest::Eval` module.
+The string argument describes the meaning of the test, and would usually look something like this *"divide_numbers should raise ArgumentError when divisor is 0"*. The block defines how the described behavior is to be tested and should return a boolean in most cases (more on this in the next section). There are a few other ways to add tests which aren't as much meant to be used literally, but when working with factory functions that generate complex tests from a few parameters like the `Numidium::Eval` module.
 
 ```ruby
 # The following three calls to add do the same thing
@@ -88,7 +90,7 @@ Both of the above tests fail; the first one prints "Magic should work", telling 
 Options
 ------------
 
-Nanotest#new can take an optional hash of named parameters. Here's a list of the possible parameters:
+Numidium#new can take an optional hash of named parameters. Here's a list of the possible parameters:
 
 * verbose: boolean # More output, tells you about passing tests as well, etc.
 * notify_pass: boolean # Also informs you of passing tests
@@ -101,22 +103,22 @@ Nanotest#new can take an optional hash of named parameters. Here's a list of the
 Options can be changed after creating a test with the `setop` method in the same way:
 
 ```ruby
-test = Nanotest.new(raise: true)
+test = Numidium.new(raise: true)
 test.setop(raise: false)
 ```
 
 new do... and run do...
 ------------
-To make defining tests on the fly easier, `Nanotest.new` and `Nanotest.run` both accept a block that is evaluated in the context of the new instance. `new` returns said instance, while `run` calls `run` on the new instance and returns its result.
+To make defining tests on the fly easier, `Numidium.new` and `Numidium.run` both accept a block that is evaluated in the context of the new instance. `new` returns said instance, while `run` calls `run` on the new instance and returns its result.
 
 ```ruby
-Nanotest.run do
+Numidium.run do
 	add { true }
 	add { 1+1==2 }
 end # Runs automatically and succeeds
 ```
 
-`Nanotest.run` takes the same arguments as `new`, and passes all extra arguments to the `run` instance method.
+`Numidium.run` takes the same arguments as `new`, and passes all extra arguments to the `run` instance method.
 
 Try
 ------------
@@ -128,7 +130,7 @@ All arguments to the run() method are passed to each individual test. Therefore 
 
 ```ruby
 # Don't do this:
-test_number = Nanotest.new do
+test_number = Numidium.new do
 	add "Larger than 0",
 		-> (x, *rest) {x>0 ? true : "Number (#{x}) is <= 0"}
 	add "Smaller than 100",
@@ -143,10 +145,10 @@ test_number.run(8, 10000)
 Subtests
 ------------
 
-Not repeating oneself is kind of a thing in programming, therefore Nanotest allows adding other test instances as subtests.
+Not repeating oneself is kind of a thing in programming, therefore Numidium allows adding other test instances as subtests.
 
 ```ruby
-supertest = Nanotest.new(message: "Everything should be fine")
+supertest = Numidium.new(message: "Everything should be fine")
 supertest.add("Yes it is") { true }
 supertest.add(world_test)
 ```
@@ -156,8 +158,8 @@ When a subtest has a `:message` option set, this string is automatically added a
 Additional arguments to `add` are passed to the subtest followed by the arguments to the tests `run` method.
 
 ```ruby
-big_test = Nanotest.new
-small_test = Nanotest.new
+big_test = Numidium.new
+small_test = Numidium.new
 small_test.add { args == [:add, :run] }
 big_test.add(small_test, :add) # passed first
 big_test.run(:run) # passed second
@@ -165,12 +167,12 @@ big_test.run(:run) # passed second
 
 Eval Module
 ------------
-Of course, with only the primitives mentioned above, creating tests for complex projects would still be a lot of work. For that reason Nanotest comes with useful module that provides factory functions for building more complex tests with less code.
+Of course, with only the primitives mentioned above, creating tests for complex projects would still be a lot of work. For that reason Numidium comes with useful module that provides factory functions for building more complex tests with less code.
 
 ```ruby
 require "nanotest/eval"
-Nanotest.run do
-	add Nanotest::Eval::equal(->{ return 100 }, "100")
+Numidium.run do
+	add Numidium::Eval::equal(->{ return 100 }, "100")
 	# Compares the results of two expressions
 end
 ```
@@ -186,10 +188,10 @@ Here are all the functions that are available thus far:
 `truthy` evaluates a given block or expression and returns `true` if it evaluated to a truthy value and `false` otherwise
 
 ```ruby
-add Nanotest::Eval::truthy { true }
-add Nanotest::Eval::truthy(message: "Truth shall be truthy") { true }
-add Nanotest::Eval::truthy(-> { true }, message: "Truth shall be truthy")
-add Nanotest::Eval::truthy("true", binding: some_binding)
+add Numidium::Eval::truthy { true }
+add Numidium::Eval::truthy(message: "Truth shall be truthy") { true }
+add Numidium::Eval::truthy(-> { true }, message: "Truth shall be truthy")
+add Numidium::Eval::truthy("true", binding: some_binding)
 ```
 
 `falsey` works like `truthy`, but does the opposite
@@ -197,33 +199,33 @@ add Nanotest::Eval::truthy("true", binding: some_binding)
 `equal` and `unequal` both evaluate two expressions or blocks and return wether they are equal or unequal respectively. If an array of bindings is provided, its first and last elements are used. These two are special in that they don't accept a block as argument, as they need two expressions to compare and one would have to be passed as an argument anyway.
 
 ```ruby
-add Nanotest::Eval::equal(->{20}, ->{10+10})
-add Nanotest::Eval::equal("20", "10+10", binding: [binding, binding], message: "math should work")
+add Numidium::Eval::equal(->{20}, ->{10+10})
+add Numidium::Eval::equal("20", "10+10", binding: [binding, binding], message: "math should work")
 ```
 
 `succeeds` takes a block/expression and optionally an exception class (passed as the `:exception` option, default is `StandardError`), evaluates the expression and returns true if nothing is raised or false if the expected expression is raised. Other exceptions are not rescued and left to the nanotest core to deal with.
 
 ```ruby
-add Nanotest::Eval::succeeds { 20 + 20 }
+add Numidium::Eval::succeeds { 20 + 20 }
 
 # This test returns `false`; it fails
-add Nanotest::Eval::succeeds(exception: ArgumentError) { raise ArgumentError }
+add Numidium::Eval::succeeds(exception: ArgumentError) { raise ArgumentError }
 
-add Nanotest::Eval::succeeds(   # This test doesn't rescue anything
+add Numidium::Eval::succeeds(   # This test doesn't rescue anything
 	-> { raise StandardError },   # the StandardError should be dealt
 	exception: ArgumentError		  # higher up, most likely in the
-)                               # Nanotest#run method if not sooner
+)                               # Numidium#run method if not sooner
 ```
 
 `fails` takes a block/expression and an optional exception class, evaluates it, and only succeeds if it raises an exception of the expected class. Other exceptions are not rescued and if nothing is raised it returns false.
 
 ```ruby
-add Nanotest::Eval::fails -> { raise "an error" }
+add Numidium::Eval::fails -> { raise "an error" }
 
 # This test succeeds, it raises the expected exception
-add Nanotest::Eval::fails(exception: ArgumentError) { raise ArgumentError }
+add Numidium::Eval::fails(exception: ArgumentError) { raise ArgumentError }
 
-add Nanotest::Eval::fails( # This test breaks, it raises an unexpected exception
+add Numidium::Eval::fails( # This test breaks, it raises an unexpected exception
 	-> { raise ArgumentError },
 	exception: RuntimeError
 )
@@ -237,8 +239,8 @@ If the `:split` option is set, `maps` will return an array of tests, one for eac
 
 ```ruby
 abs = ->(x){x>=0 ? x : -x}
-Nanotest.run do
-	add Nanotest::Eval::maps
+Numidium.run do
+	add Numidium::Eval::maps
 		abs,
 		{
 			[ 1] => 1
@@ -258,8 +260,8 @@ class Klass
 		x/y
 	end
 end
-Nanotest.run do
-	add Nanotest::Eval::maps
+Numidium.run do
+	add Numidium::Eval::maps
 		Klass.new.method(:divide),
 		{
 			[1,1] => 1,
@@ -279,7 +281,7 @@ Add them with the `before` and `after` methods (aliased as `setup` and `cleanup`
 This block will receive all arguments to the `run` method, and in the case of `after`, the number of failed subtests before that.
 
 ```ruby
-Nanotest.run(:some, :random, :arguments) do
+Numidium.run(:some, :random, :arguments) do
 	after { puts "This happens at the end" }
 	after { |success| puts "The tests were #{success==0? "successful" : "unsuccessful"}." }
 	before { puts "This happens first" }
@@ -304,7 +306,7 @@ Argumens. The answer is arguments. Imagine the following test:
 ```ruby
 adder = ->(a,b) {a+b}
 ...
-test_adder = Nanotest.new(message: "A lambda should correctly add two numbers") begin
+test_adder = Numidium.new(message: "A lambda should correctly add two numbers") begin
 	add("Should correctly add  1 + 1") {adder.call( 1,1) ==	2}
 	add("Should correctly add  0 + 1") {adder.call( 0,1) ==	1}
 	add("Should correctly add -1 + 0") {adder.call(-1,0) == -1}
@@ -315,7 +317,7 @@ This test only checks a single lambda, and the deterministic nature of the test 
 
 ```ruby
 ...
-test_adder_generic = Nanotest.new(message: "A lambda should add two numbers") begin
+test_adder_generic = Numidium.new(message: "A lambda should add two numbers") begin
 	add("Should correctly add  1 + 1") { |arg_adder| arg_adder.call(1,1) ==  2 }
 	... # the other 2 tests
 end
@@ -341,7 +343,7 @@ test_adder_generic.run(portable_adder_function)
 Like this; when running a test, any argument to the run method is passed to all the subtests. But the best part comes now:
 
 ```ruby
-Nanotest.new(message: "Test optimized code") do
+Numidium.new(message: "Test optimized code") do
 	sub test_adder_generic, optimized_adder_function
 end
 ...

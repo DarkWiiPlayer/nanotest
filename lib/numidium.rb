@@ -1,5 +1,5 @@
 # vim: set noexpandtab list:
-class Nanotest
+class Numidium
 	def self.version
 		return [0, 3, 3]
 	end
@@ -69,7 +69,7 @@ class Nanotest
 			end
 		end
 		@after.each { |step| step.call(failed,*args) }
-		raise NanoTestFailed,<<~EOM if opts :raise and failed>0
+		raise NumidiumTestFailed,<<~EOM if opts :raise and failed>0
 			#{failed} test#{failed>1 && 's' || nil} did not pass (see message#{ failed>1 ? 's' : nil } above)
 		EOM
 		return failed
@@ -87,4 +87,4 @@ class Nanotest
 		puts "#{@opts[:line_start]}Test #{pass ? "passed" : "failed"}: #{@opts[:prefix]}#{msg}"
 	end
 end
-class NanoTestFailed < StandardError; end
+class NumidiumTestFailed < StandardError; end

@@ -1,6 +1,6 @@
 # vim: set noexpandtab:
 
-class Nanotest
+class Numidium
 	module Eval
 		module Helper
 			def self.raises?(expr, except=nil, b=binding, *args)

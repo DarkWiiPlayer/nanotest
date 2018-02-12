@@ -7,20 +7,20 @@ end
 
 task :clean do
   puts "\nCleaning directory..."
-  puts "Deleted #{File::delete *(Dir::glob "nanotest*.gem")} file(s)."
+  puts "Deleted #{File::delete *(Dir::glob "numidium*.gem")} file(s)."
 end
 
 task build: [:test, :clean] do
   puts
   puts "Building Gem"
   puts "============"
-  abort unless system "gem build nanotest.gemspec"
+  abort unless system "gem build numidium.gemspec"
 end
 
 task install: :build do
   puts
   puts "Installing Gem"
   puts "=============="
-  abort unless system "gem install nanotest*.gem"
-  puts "\nNanotest has been installed ♥"
+  abort unless system "gem install numidium*.gem"
+  puts "\nNumidium has been installed ♥"
 end
