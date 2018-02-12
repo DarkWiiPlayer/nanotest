@@ -1,7 +1,7 @@
 require_relative "lib/numidium"
 
 Gem::Specification.new do |spec|
-  spec.name = "Numidium"
+  spec.name = "numidium"
   spec.version = Numidium.version.join "."
   spec.authors = ["Dennis Fischer"]
   spec.email   = ["dennis.fischer.wasd@gmail.com"]
