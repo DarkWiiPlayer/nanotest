@@ -165,6 +165,31 @@ big_test.add(small_test, :add) # passed first
 big_test.run(:run) # passed second
 ```
 
+Before/After
+------------
+
+For setup/cleanup and output you can add before- and after-actions.
+
+Add them with the `before` and `after` methods (aliased as `setup` and `cleanup`, if you prefer that), passing a block.
+
+This block will receive all arguments to the `run` method, and in the case of `after`, the number of failed subtests before that.
+
+```ruby
+Numidium.run(:some, :random, :arguments) do
+	after { puts "This happens at the end" }
+	after { |success| puts "The tests were #{success==0? "successful" : "unsuccessful"}." }
+	before { puts "This happens first" }
+	before { |*args_to_run| puts "arguments: #{args_to_run}" }
+
+	add { puts "some test"; return true }
+end
+```
+
+You can also pass a Proc or a Lambda to the `before` and `after` methods. This can be useful for moving more complex output logic out of the test logic or reusing code when various tests should have similar output or setup/cleanup steps.
+
+Standard Modules
+================
+
 Eval Module
 ------------
 Of course, with only the primitives mentioned above, creating tests for complex projects would still be a lot of work. For that reason Numidium comes with useful module that provides factory functions for building more complex tests with less code.
@@ -271,27 +296,44 @@ Numidium.run do
 end
 ```
 
-Before/After
+Suite Class
 ------------
+For those who prefer writing their tests as classes, or just want to add one more layer to their testing environment, there's the `Numidium::Suite` class.
 
-For setup/cleanup and output you can add before- and after-actions.
+The class itself doesn't do much when instanciated; instead it should be used as superclass for individual test suites. Instances of a test suite act like instances of the Numidium core class, but the class itself differs in that it keeps track of all of its instances and subclasses, and the `run` and `try` methods are recursively called on all of them.
 
-Add them with the `before` and `after` methods (aliased as `setup` and `cleanup`, if you prefer that), passing a block.
+### When to use?
 
-This block will receive all arguments to the `run` method, and in the case of `after`, the number of failed subtests before that.
+Suites should be used over complex constructs of tests with subtest when:
+1. the test would need to be globally available, either as a CONSTANT or a $global variable.
+2. there is a lot of tests in a complex structure, or a high probability that this will be the case later on.
+3. the test suite alone is enough to fully verify the integrity of the logical unit it is associated to.
+4. there is no need for re-usability; Suites are meant to test (only) a single component.
+
+### When NOT to use?
+
+Tests (with subtests) should be used over Suites when:
+1. they are meant to be anonymous and interchangeable.
+2. there isn't much complexity nor an immediate need for scalability.
+3. they need to be executed in combination with other tests to fully verify the integrity of the logical unit they are testing. (only tests part of the functionality)
+4. there is need for re-usability. Tests can be applied to many similar components through their arguments.
+
+Note that points 3. and 4. may change in the future
 
 ```ruby
-Numidium.run(:some, :random, :arguments) do
-	after { puts "This happens at the end" }
-	after { |success| puts "The tests were #{success==0? "successful" : "unsuccessful"}." }
-	before { puts "This happens first" }
-	before { |*args_to_run| puts "arguments: #{args_to_run}" }
+  class TestSomeClass < Numidium::Suite; end
 
-	add { puts "some test"; return true }
-end
+  TestSomeClass.new(prefix: "to_s should ") do
+    add("return a strung") { SomeClass.new.to_s.is_a? String }
+  end
+
+  TestSomeClass.new(prefix: "to_a should ") do
+    add(Numidium::Eval.raises(exception: NotImplementedError,
+                              message: "raise an error, as it isn't implemented yet")) do
+      SomeClass.new.to_a()
+    end
+  end
 ```
-
-You can also pass a Proc or a Lambda to the `before` and `after` methods. This can be useful for moving more complex output logic out of the test logic or reusing code when various tests should have similar output or setup/cleanup steps.
 
 Advanced Uses
 ====================

@@ -50,7 +50,7 @@ class Numidium
 		tests.each_with_index do |test, i|
 			begin
 				result = test[1].call(*args)
-			rescue StandardError => e
+			rescue Exception => e # because ScriptError doesn't inherit from StandardError
 				result =
 					"#{test[0]}\nTest threw an exception (#{e.class}):\n" +
 					" -> #{e.message}\nBacktrace:\n" +

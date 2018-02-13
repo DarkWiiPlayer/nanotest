@@ -6,3 +6,6 @@ $test_core.run
 
 require_relative "eval"
 $test_eval.run
+
+require_relative "suite"
+$test_suite.run
