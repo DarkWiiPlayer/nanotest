@@ -60,6 +60,35 @@ $test_suite = Numidium.new(break_on_fail: true, raise: true, prefix: "suite> ") 
     suite.try(true) && !suite.try(false)
   end
 
+  add("params should be passed as arguments") do
+    suite = Class.new(Numidium::Suite) do
+      @params << true
+      new do
+        add ->(a,b) { true }
+      end
+    end
+    suite.try(true)
+  end
+
+  add("params should be passed before arguments") do
+    suite = Class.new(Numidium::Suite) do
+      @params << :param
+      new do
+        add ->(first, second) { first==:param && second==:arg }
+      end
+    end
+    suite.try(:arg)
+  end
+
+  add("params should be immutably accessible from outside") do
+    suite = Class.new(Numidium::Suite) do
+      new do
+        add -> (*args) { args == [] }
+      end
+    end
+    suite.params.frozen?
+  end
+
   add("tests within tests") do
     suite = Class.new(Numidium::Suite) do
       new do
