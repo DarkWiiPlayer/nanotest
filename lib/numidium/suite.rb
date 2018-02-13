@@ -14,15 +14,15 @@ class Numidium
           @instances  = []
         end
       end
-      def subclass.run
+      def subclass.run(*args)
         acc = 0
-        acc = @subclasses.inject(acc) { |acc, sub| acc + sub.run }
-        acc = @instances.inject(acc) { |acc, obj| acc + obj.run }
+        acc = @subclasses.inject(acc) { |acc, sub| acc + sub.run(*args) }
+        acc = @instances.inject(acc) { |acc, obj| acc + obj.run(*args) }
       end
-      def subclass.try
+      def subclass.try(*args)
         acc = true
-        acc = @subclasses.inject(acc) { |acc, sub| acc & sub.try }
-        acc = @instances.inject(acc) { |acc, obj| acc & obj.try }
+        acc = @subclasses.inject(acc) { |acc, sub| acc && sub.try(*args) }
+        acc = @instances.inject(acc) { |acc, obj| acc && obj.try(*args) }
       end
     end
 

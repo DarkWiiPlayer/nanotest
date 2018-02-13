@@ -39,7 +39,7 @@ $test_suite = Numidium.new(break_on_fail: true, raise: true, prefix: "suite> ") 
     suite.try
   end
 
-  add("try fail succeed if any subtest fails") do
+  add("try should fail if any subtest fails") do
     suite = Class.new(Numidium::Suite) do
       new do
         add { false }
@@ -49,6 +49,15 @@ $test_suite = Numidium.new(break_on_fail: true, raise: true, prefix: "suite> ") 
       end
     end
     !suite.try
+  end
+
+  add("arguments to run should be passed") do
+    suite = Class.new(Numidium::Suite) do
+      new do
+        add ->(arg) { arg }
+      end
+    end
+    suite.try(true) && !suite.try(false)
   end
 
   add("tests within tests") do
