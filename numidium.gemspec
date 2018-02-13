@@ -3,6 +3,8 @@ require_relative "lib/numidium"
 Gem::Specification.new do |spec|
   spec.name = "numidium"
   spec.version = Numidium.version.join "."
+  s.homepage   = 'https://github.com/DarkWiiPlayer/numidium'
+  s.metadata    = { "source_code_uri" => "https://github.com/DarkWiiPlayer/numidium" }
   spec.authors = ["Dennis Fischer"]
   spec.email   = ["dennis.fischer.wasd@gmail.com"]
   spec.summary = "A minimalistic TDD library"
