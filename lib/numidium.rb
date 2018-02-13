@@ -18,7 +18,7 @@ class Numidium
 	def add(arg=nil, *args, &block)
 		if block then
 			arg.is_a?(String) && add(arg, block) || add(block)
-		elsif arg.is_a?(String) and args[0].is_a?(Proc) then
+		elsif (arg.is_a?(String) or arg.nil?) and args[0].is_a?(Proc) then
 			@tests << [arg, args[0]]
 		elsif arg.is_a? self.class then
 			sub = -> (*largs) { arg.run(*args, *largs) == 0 }
