@@ -2,14 +2,14 @@ Numidium [![Build Status](https://travis-ci.org/DarkWiiPlayer/numidium.svg?branc
 ============
 Numidium is a minimalistic library for writing test cases in ruby. It was built with test driven development in mind, but tries to make no assumptions about the use case the tests are written for.
 
-One of nanotests simplicity goals is that the entire core implementation fits on my (1080x1920px) screen in the font size I use during development. The main design filosophy is doing as much as possible with as little code and as little documentation as possible. One shouldn't have to spend hours learning a tool that doesn't get any work done by itself but only serves to ensure quality and *save time*.
+One of numidiums simplicity goals is that the entire core implementation fits on my (1080x1920px) screen in the font size I use during development. The main design filosophy is doing as much as possible with as little code and as little documentation as possible. One shouldn't have to spend hours learning a tool that doesn't get any work done by itself but only serves to ensure quality and *save time*.
 
-**Note**: Numidium was called Nanotest once, but then I found out there's what feels like a few thousand other gems with that name, so I renamed it to Numidium because 1) it also starts with N 2) has the same number of letters and 3) elder scrolls is awesome
+**Note**: Numidium was called Numidium once, but then I found out there's what feels like a few thousand other gems with that name, so I renamed it to Numidium because 1) it also starts with N 2) has the same number of letters and 3) elder scrolls is awesome
 
 Introcuction
 ------------
 
-At the core of the library is the Numidium class which defines what a test looks like. In a more abstract context, I refer to this as the nanotest *core*. A nanotest instance is a collection of subtests consisting of a message and a lambda. I will refer to these as *[test] atoms* or *atomic tests*, as they are are the smallest units defined by nanotest.
+At the core of the library is the Numidium class which defines what a test looks like. In a more abstract context, I refer to this as the numidium *core*. A numidium instance is a collection of subtests consisting of a message and a lambda. I will refer to these as *[test] atoms* or *atomic tests*, as they are are the smallest units defined by numidium.
 
 Internally, *atoms* are stored like this:
 
@@ -19,7 +19,7 @@ Internally, *atoms* are stored like this:
 
 ### Adding Tests
 
-The add method adds a test case to a nanotest object. It can take several formats of arguments, but they all come down to one or more pairs of a string and a lambda. The main way to add a subtest is this though:
+The add method adds a test case to a numidium object. It can take several formats of arguments, but they all come down to one or more pairs of a string and a lambda. The main way to add a subtest is this though:
 
 ```ruby
 world_test = Numidium.new
@@ -51,7 +51,7 @@ A test fails when the expression returns a falsey value (`false` or `nil`) or a 
 
 Any other value means the test will fail as of the current implementation, but it is not garanteed that future versions will keep this behavior. The use of `true` is strongly encouraged as it is the only truthy value that will most likely always be treated as a success value.
 
-If a test fails to rescue an error, it automatically fails, and nanotest will tell you about it. Such a test is considered *broken* because it did not deal with the exception, and presumably not expect it either. This suggests either that the test itself needs fixing, or, more likely, that some other test needs to be run first.
+If a test fails to rescue an error, it automatically fails, and numidium will tell you about it. Such a test is considered *broken* because it did not deal with the exception, and presumably not expect it either. This suggests either that the test itself needs fixing, or, more likely, that some other test needs to be run first.
 
 Normally tests should deal with __expected__ exceptions internally and fail (or succeed) when they are detected. Keep in mind though that tests should react to as few exceptions as possible, to avoid mistaking a broken test for a failing one. The Eval module provides some useful helper functions for this.
 
@@ -60,7 +60,7 @@ Normally tests should deal with __expected__ exceptions internally and fail (or 
 If an atom fails with `nil` or `false`, its default message is printed; if it fails with a string, that string is printed instead.
 
 ```ruby
-nanotest.run do
+Numidium.run do
 	add("default message") { false } # this outputs a default message
 	add("default message") { "custom message" } # this outputs a custom message
 	add { false } # this outputs nothing
@@ -70,8 +70,8 @@ end
 If no default fail message is provided and the test fails with `nil` or `false`, nothing at all is printed (use this when you want to deal with the output elsewhere).
 
 ```ruby
-big_test = nanotest.new do
-	add (nanotest.new message: "numbers must work" do
+big_test = Numidium.new do
+	add (Numidium.new message: "numbers must work" do
 		add { 1 == 1 }
 		add { 2 == 2 }
 	end)
@@ -97,7 +97,7 @@ Numidium#new can take an optional hash of named parameters. Here's a list of the
 * silent: boolean # No output at all
 * break_on_fail: boolean # Breaks after the first test has failed, runs after-actions
 * abort_on_fail: boolean # Aborts after the first test has failed, skips after-actions
-* raise: boolean # Raises a NanoTestFailed exception when any test has failed (combine with break_on_fail to raise instantly)
+* raise: boolean # Raises a NumidiumTestFailed exception when any test has failed (combine with break_on_fail to raise instantly)
 * random: boolean # shuffles the order of the tests
 
 Options can be changed after creating a test with the `setop` method in the same way:
@@ -195,7 +195,7 @@ Eval Module
 Of course, with only the primitives mentioned above, creating tests for complex projects would still be a lot of work. For that reason Numidium comes with useful module that provides factory functions for building more complex tests with less code.
 
 ```ruby
-require "nanotest/eval"
+require "Numidium/eval"
 Numidium.run do
 	add Numidium::Eval::equal(->{ return 100 }, "100")
 	# Compares the results of two expressions
@@ -228,7 +228,7 @@ add Numidium::Eval::equal(->{20}, ->{10+10})
 add Numidium::Eval::equal("20", "10+10", binding: [binding, binding], message: "math should work")
 ```
 
-`succeeds` takes a block/expression and optionally an exception class (passed as the `:exception` option, default is `StandardError`), evaluates the expression and returns true if nothing is raised or false if the expected expression is raised. Other exceptions are not rescued and left to the nanotest core to deal with.
+`succeeds` takes a block/expression and optionally an exception class (passed as the `:exception` option, default is `StandardError`), evaluates the expression and returns true if nothing is raised or false if the expected expression is raised. Other exceptions are not rescued and left to the numidium core to deal with.
 
 ```ruby
 add Numidium::Eval::succeeds { 20 + 20 }
@@ -374,7 +374,7 @@ Maybe at this point it would be worth switching to lambdas because that way ruby
 ...
 ```
 
-Now we have a NanoTest with three subtests that each take an argument... but where does that argument come from? Let's assume we have some generic ruby code and some optimized code that targets a specific platform and is written in C. Both of them should act the same way and differ only in speed and portability.
+Now we have a Numidium with three subtests that each take an argument... but where does that argument come from? Let's assume we have some generic ruby code and some optimized code that targets a specific platform and is written in C. Both of them should act the same way and differ only in speed and portability.
 
 ```ruby
 ... # define two adder lambdas
