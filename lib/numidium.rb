@@ -1,9 +1,7 @@
 # vim: set noexpandtab list:
-class Numidium
-	def self.version
-		return [0, 3, 3]
-	end
+require_relative "numidium/version"
 
+class Numidium
 	def self.run(opts={}, *args, &block)
 		new(opts, &block).run(*args)
 	end
