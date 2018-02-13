@@ -4,7 +4,7 @@ Numidium is a minimalistic library for writing test cases in ruby. It was built 
 
 One of numidiums simplicity goals is that the entire core implementation fits on my (1080x1920px) screen in the font size I use during development. The main design filosophy is doing as much as possible with as little code and as little documentation as possible. One shouldn't have to spend hours learning a tool that doesn't get any work done by itself but only serves to ensure quality and *save time*.
 
-**Note**: Numidium was called Numidium once, but then I found out there's what feels like a few thousand other gems with that name, so I renamed it to Numidium because 1) it also starts with N 2) has the same number of letters and 3) elder scrolls is awesome
+**Note**: Numidium was called Nanotest once, but then I found out there's what feels like a few thousand other gems with that name, so I renamed it to Numidium because 1) it also starts with N 2) has the same number of letters and 3) elder scrolls is awesome
 
 Introcuction
 ------------
