@@ -1,4 +1,5 @@
 task default: :install
+require_relative "lib/numidium/version"
 
 task :test do
   puts
@@ -22,5 +23,5 @@ task install: :build do
   puts "Installing Gem"
   puts "=============="
   abort unless system "gem install numidium*.gem"
-  puts "\nNumidium has been installed ♥"
+  puts "\nNumidium #{Numidium.version.join(".")} has been installed ♥"
 end

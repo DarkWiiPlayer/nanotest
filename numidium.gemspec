@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Dennis Fischer"]
   spec.email   = ["dennis.fischer.wasd@gmail.com"]
   spec.summary = "A minimalistic TDD library"
-  spec.description = "A minimal TDD library aimed at providing a simple interface that can be learned in less than 10 minutes and a few functions that generate tests for common cases"
+  spec.description = "A minimalistic TDD library aimed at providing a simple interface that can be learned in less than 10 minutes and a few functions that generate tests for common cases."
   spec.licenses = ["MIT"]
   spec.files = []
 
