@@ -22,17 +22,17 @@ $test_core = Numidium.new(break_on_fail: true, raise: true, prefix: "core> ") do
 
 	add("all ways of adding tests should work") do
 		t = Numidium.new(silent: true) do
-			add { true }
+			add { false }
 			add [
-				-> { true },
-				-> { true },
+				"Message",
+				-> { false },
 			]
 			add({
-				"The world should make sense" => lambda { 1 == 1 },
-				"Math should make sense" => lambda { 1 + 2 == 3 },
+				"The world should make not sense" => lambda { 1 == 2 },
+				"Math should make not sense either" => lambda { 1 + 2 == 4 },
 			})
 		end
-		t.run == 0
+		t.run == 4
 	end
 
 	# Adding Subtests

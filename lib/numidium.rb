@@ -45,27 +45,26 @@ end; alias :define :add; alias :<< :add
 
 	def run(*args)
 		@before.each { |step| step.call(*args) }
-		failed = 0
 		tests = (opts :random) ? @tests.shuffle : @tests
-		tests.each_with_index do |test, i|
+		failed = tests.inject(0) do |acc, test|
 			begin
 				result = test[1].call(*args)
 			rescue Exception => e # because ScriptError doesn't inherit from StandardError
 				result =
 					"#{test[0]}\nTest threw an exception (#{e.class}):\n" +
 					" -> #{e.message}\nBacktrace:\n" +
-					"#{e.backtrace.join "\n" }" +
-					"\n...this means your test is broken, go fix it!"
+					"#{e.backtrace.join "\n" }"
 			end
 			if result and not result.is_a?(String) then
 				notify(test[0],true,i) if opts :notify_pass, :verbose
+				acc
 			else
-				notify(result || test[0],false,i) if (result or test[0]) and not opts :silent
-				failed += 1
+				notify((result || test[0]).to_s, false) if (result or test[0]) and not opts :silent
 				return true if opts :abort_on_fail
 				break if opts :break_on_fail
+				acc += 1
 			end
-		end
+		end || 1
 		@after.each { |step| step.call(failed,*args) }
 		raise NumidiumTestFailed,<<~EOM if opts :raise and failed>0
 			#{failed} test#{failed>1 && 's' || nil} did not pass (see message#{ failed>1 ? 's' : nil } above)
@@ -79,9 +78,9 @@ end; alias :define :add; alias :<< :add
 	def opts(*args) args.empty? ? opts.dup.freeze : args.any? { |arg| @opts[arg] } end
 	def setop(opts={}) opts.each { |k,v| @opts[k]=v } end
 
-	private
+	private # ====================================================================
 
-	def notify(msg, pass, i=0)
+	def notify(msg, pass)
 		puts "#{@opts[:line_start]}Test #{pass ? "passed" : "failed"}: #{@opts[:prefix]}#{msg}"
 	end
 end
