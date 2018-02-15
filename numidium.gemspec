@@ -11,6 +11,7 @@ Gem::Specification.new do |spec|
   spec.description = "A minimalistic TDD library aimed at providing a simple interface that can be learned in less than 10 minutes and a few functions that generate tests for common cases."
   spec.licenses = ["MIT"]
   spec.files = []
+  spec.required_ruby_version = ">= 2.4"
 
 	spec.files << "lib/numidium.rb"
   Dir.glob("lib/numidium/*").each { |file| spec.files << file }
