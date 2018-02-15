@@ -2,7 +2,7 @@ require_relative "../lib/numidium/block"
 
 $test_block = Numidium.new(break_on_fail: true, raise: true, prefix: "block> ") do
 
-	after -> (success) { puts success==0 && "block method OK" || nil }
+	after -> (success) { puts success==0 && "Block method OK" || nil }
 
 	add(Numidium.new(prefix: "block should ", break_on_fail: true) do
 		before { @blocktest = Numidium.block { true } }

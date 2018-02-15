@@ -12,3 +12,6 @@ $test_suite.run
 
 require_relative "block"
 $test_block.run
+
+require_relative "syntax"
+$test_syntax.run

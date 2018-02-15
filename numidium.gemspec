@@ -13,12 +13,7 @@ Gem::Specification.new do |spec|
   spec.files = []
 
 	spec.files << "lib/numidium.rb"
-
-	spec.files << "lib/numidium/version.rb"
-	spec.files << "lib/numidium/eval.rb"
-	spec.files << "lib/numidium/syntax.rb"
-	spec.files << "lib/numidium/suite.rb"
-	spec.files << "lib/numidium/block.rb"
+  Dir.glob("lib/numidium/*").each { |file| spec.files << file }
 
   spec.files << "rakefile"
   Dir.glob("tests/*").each { |file| spec.files << file }
