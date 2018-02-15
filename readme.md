@@ -298,9 +298,9 @@ end
 
 Syntax Module
 ------------
-It is part of the Numidium filosophy that when a test crashes, it is either broken or assumes untested behavior. This also includes file syntax, so when a test (read: ruby file containing testing code) fails at a `require`, that also means the test is broken.
+It is part of the Numidium philosophy that, when a test crashes, it is either broken or assumes untested behavior. This also includes file syntax, so when a test (read: ruby file containing testing code) fails at a `require`, that also means the test is broken.
 
-Enter the Numidium::Syntax. It allows you to check the (syntactical) validity of ruby code, meaning that even if it's broken in terms of behavior, ruby will be able to at least load it.
+Enter Numidium::Syntax. It allows you to check the (syntactical) validity of ruby code, meaning that even if it's broken in terms of behavior, ruby will be able to at least load it.
 
 ```ruby
 # inside some test
@@ -313,9 +313,18 @@ add { MyMath.divide(4/2)==2 }
 
 note calling `require` before **running** the test effectively breaks this feature, as it never has a chance to even check the syntax. See planned features.
 
+If needed, you can also check individual code snippets with the `string` method.
+
+```ruby
+add("my_func should return a string") { (@str=my_func.()).is_a? String }
+add(Numidium::Syntax.string(@str, message:"my_func should return valid ruby code"))
+# Note that this is presumably executed within the binding of a Numidium test, otherwise
+# add wouldn't work, so we can use @instance variables that will be saved to said test.
+```
+
 Planned Feature:
-- Nanotest.require and ...require_relative methids for specifying libraries that the test needs to require before running them, but with an added syntax step
-- Currently file paths have to be specified, but a Nanotest::Syntax.require(_relative) feature sure would be nice.
+- Numidium.require and ...require_relative methods for specifying libraries that the test needs to require before running them, but with an added syntax checking step.
+- Currently file paths have to be specified, but a Numidium::Syntax.require(_relative) feature sure would be nice.
 
 Block Methods
 ------------
@@ -345,7 +354,14 @@ end
 some_test.add block_test
 ```
 
-*Planned feature: continue even after failed tests (maybe?)*
+### Options
+`block`
+- `abort: true` set this to false and the test will continue to evaluate until the block ends, then fail.
+- `notify: false` the block itself will take care of outputting messages when an assertion fails. This is meant mostly to be used with `abort: false`.
+
+`block_test`
+- `notify: false` when true, :silent will default to true unless explicitly set, so the Numidium instance won't generate redundant output that is less specific than the test block.
+- All options are also passed to Numidium.new
 
 Suite Class
 ------------

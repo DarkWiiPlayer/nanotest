@@ -80,8 +80,13 @@ end; alias :define :add; alias :<< :add
 
 	private # ====================================================================
 
-	def notify(msg, pass)
-		puts "#{@opts[:line_start]}Test #{pass ? "passed" : "failed"}: #{@opts[:prefix]}#{msg}"
+	def notify(msg, pass, opts={})
+		msg = "#{@opts[:line_start]}Test #{pass ? "passed" : "failed"}: #{@opts[:prefix]}#{msg}"
+		puts \
+			case opts[:location]
+				when Array then msg + "\n+-> " + opts[:location].join(":")
+				else msg
+			end
 	end
 end
 class NumidiumTestFailed < StandardError; end

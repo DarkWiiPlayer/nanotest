@@ -5,7 +5,7 @@ $test_block = Numidium.new(break_on_fail: true, raise: true, prefix: "block> ") 
 	after -> (success) { puts success==0 && "Block method OK" || nil }
 
 	add(Numidium.new(prefix: "block should ", break_on_fail: true) do
-		before { @blocktest = Numidium.block { true } }
+		before { @blocktest = Numidium.block(message: "msg") { true } }
 
 		add("return an array.") { @blocktest.is_a? Array }
 		add("return an array with (at least) two elements") { @blocktest.length >= 2 }
@@ -26,11 +26,11 @@ $test_block = Numidium.new(break_on_fail: true, raise: true, prefix: "block> ") 
 		end
 
 		add("fail with the message given to the assert method") do
-			Numidium.block("block"){ assert("assert"){ false } }[1].call == "assert"
+			Numidium.block(message: "block"){ assert("assert"){ false } }[1].call == "assert"
 		end
 
     add("use the test description") do
-      Numidium.block("message"){ assert { false } }[0] == "message"
+      Numidium.block(message: "message"){ assert { false } }[0] == "message"
     end
 	end)
 
@@ -47,11 +47,10 @@ $test_block = Numidium.new(break_on_fail: true, raise: true, prefix: "block> ") 
 	end)
 
 	add("block_test should run a new test.") do
-		res = Numidium.block_test do
+		false == Numidium.block_test() do
 			assert { false }
 			assert { true }
 			assert { false }
 		end
-		res == 1
 	end
 end

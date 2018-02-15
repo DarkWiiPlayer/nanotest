@@ -1,5 +1,13 @@
 class Numidium
 	class BlockEnvironment
+		def initialize(opts={})
+			@failed=0
+			@succeeded=0
+			@opts=opts.freeze
+			@notify = Numidium.new().method(:notify)
+		end
+		attr_reader :failed, :succeeded
+
 		def assert(*args, &block)
 			args = args[0] if args[0].is_a?(Array)
 			test = 
@@ -14,27 +22,43 @@ class Numidium
 			end
 
 			if !test[1].call then
-				throw(:numidium_block, test[0])
+				@notify.(test.first || "Assertion failed", false, location: test.last.source_location) if @opts[:notify]
+				if @opts[:abort]
+					throw(:numidium_block, test.first)
+				else
+					@failed+=1
+				end
+			else
+				@succeeded+=1
 			end
 		end
 	end
 
-	def self.block(msg="", &block)
+	def self.block(opts={}, &block)
+		opts[:abort] = true unless opts.has_key?(:abort)
 		return [
-			msg,
+			opts[:message],
 			lambda do |*args|
 				reason = catch(:numidium_block) do
-					BlockEnvironment.new.instance_eval(&block)
-					return true
+					block_env = BlockEnvironment.new(opts)
+					block_env.instance_eval(&block)
+
+					if block_env.failed == 0 then
+						return true
+					else
+						return false
+					end
 				end
 				return reason || false
 			end
 		]
 	end
 
-	def self.block_test(message=nil, *args, &block)
-		run(*args) do
-			add(self.class.block(message, &block))
+	def self.block_test(opts={}, &block)
+		opts[:silent] = opts[:notify] unless opts.has_key?(:silent)
+		test = new(opts) do
+			add(self.class.block(opts, &block))
 		end
+		test.try(*opts[:args])
 	end
 end
