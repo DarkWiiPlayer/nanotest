@@ -14,8 +14,8 @@ end
 require_relative "../lib/numidium"
 
 raise "Something very basic is broken :(" if [
-	Numidium.run(silent: true){ add -> { true } } <1,
-	Numidium.run(silent: true){ add -> { "Witchcraft" == "Works" } } >0,
+	Numidium.run(silent: true){ add { true } } <1,
+	Numidium.run(silent: true){ add { "Witchcraft" == "Works" } } >0,
 ].any? { |e| !e }
 
 raise "Numidium can't count :(" unless Numidium.run(silent: true) {

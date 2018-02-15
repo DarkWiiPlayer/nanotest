@@ -15,25 +15,25 @@ class Numidium
 		self.instance_eval(&block) if block
 	end
 
-	def add(arg=nil, *args, &block)
-		if block then
-			arg.is_a?(String) && add(arg, block) || add(block)
-		elsif (arg.is_a?(String) or arg.nil?) and args[0].is_a?(Proc) then
-			@tests << [arg, args[0]]
-		elsif arg.is_a? self.class then
-			sub = -> (*largs) { arg.run(*args, *largs) == 0 }
-			add arg.message && [arg.message, sub] || sub
-		elsif arg.is_a?(Proc) then
-			@tests << [(opts :verbose) ? "Unnamed test case" : nil, arg]
-		elsif arg.is_a?(Array) then
-			add Hash[*arg.flatten]
-		elsif arg.is_a?(Hash) then
-			arg.each { |key, value| add key, value }
-		else
-			raise ArgumentError, "Wrong arguments provided: [#{[arg.class] + args.map { |e| e.class }}]"
-		end
-		return self
-	end; alias :define :add
+def add(first=nil, *args, &block)
+	if block then
+		@tests << [first, block]
+	elsif first.is_a? self.class then
+		@tests << [first.message, ->(*largs) { first.try(*args, *largs) }]
+	elsif first.respond_to? :call then
+		@tests << [nil, first]
+	elsif args.first.respond_to? :call then
+		@tests << [first, args.first]
+	elsif first.is_a? Array then
+		add(*first, &block)
+	elsif first.is_a? Hash then
+		first.each { |msg,prc| add([msg, prc]) }
+	else
+		raise ArgumentError,
+			"Wrong arguments provided: #{[first.class] + args.map { |e| e.class }}"
+	end
+	return self
+end; alias :define :add; alias :<< :add
 
 	def before(step=nil, &block)
 		@before << (block || step || raise(ArgumentError, "Neither block nor lambda provided"))

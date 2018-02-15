@@ -23,7 +23,6 @@ $test_core = Numidium.new(break_on_fail: true, raise: true, prefix: "core> ") do
 	add("all ways of adding tests should work") do
 		t = Numidium.new(silent: true) do
 			add { true }
-      add -> { true }
 			add [
 				-> { true },
 				-> { true },
@@ -44,7 +43,7 @@ $test_core = Numidium.new(break_on_fail: true, raise: true, prefix: "core> ") do
 		test.run >= 1
 	end
 
-	add("a test should succeed when no subtest fails (#{__LINE__})") do
+	add("a test should pass when no subtest fails (#{__LINE__})") do
 		test = Numidium.new(silent: true)
 		test.add(Numidium.new(silent: true) { add { true } })
 		test.run == 0
