@@ -296,6 +296,57 @@ Numidium.run do
 end
 ```
 
+Syntax Module
+------------
+It is part of the Numidium filosophy that when a test crashes, it is either broken or assumes untested behavior. This also includes file syntax, so when a test (read: ruby file containing testing code) fails at a `require`, that also means the test is broken.
+
+Enter the Numidium::Syntax. It allows you to check the (syntactical) validity of ruby code, meaning that even if it's broken in terms of behavior, ruby will be able to at least load it.
+
+```ruby
+# inside some test
+add(Numidium::Syntax.file("lib/my_math.rb"))
+...
+# later on, in some other test
+before { require_relative "../lib/my_mayt" }
+add { MyMath.divide(4/2)==2 }
+```
+
+note calling `require` before **running** the test effectively breaks this feature, as it never has a chance to even check the syntax. See planned features.
+
+Planned Feature:
+- Nanotest.require and ...require_relative methids for specifying libraries that the test needs to require before running them, but with an added syntax step
+- Currently file paths have to be specified, but a Nanotest::Syntax.require(_relative) feature sure would be nice.
+
+Block Methods
+------------
+While using Numidium I often found myself in situations where I want to embed test assertions in the code. When defining a normal Numidium test, the code surrounding the tests is all executed as the tests are being added, not between the execution of the tests.
+
+Numidium.block and Numidium.block_test are here to fix this problem!
+
+```ruby
+Numidium.block_test do
+  variable = 10
+  assert { variable == 10 } # succeeds!
+  variable = 10
+  assert { variable == 20 } # also succeeds!
+  variable = 30
+  assert { variable == 40 } # fails and aborts
+  variable = 40 # is never reached
+end
+```
+
+of course you can also generate tests and add them to one or more Numidium instances later on
+
+```ruby
+...
+block_test = Numidium.block do
+  assert { false } # fails and aborts
+end
+some_test.add block_test
+```
+
+*Planned feature: continue even after failed tests (maybe?)*
+
 Suite Class
 ------------
 For those who prefer writing their tests as classes, or just want to add one more layer to their testing environment, there's the `Numidium::Suite` class.
