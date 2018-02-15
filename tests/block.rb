@@ -1,6 +1,6 @@
 require_relative "../lib/numidium/block"
 
-$test_block = Numidium.new(break_on_fail: true, raise: true, prefix: "core> ") do
+$test_block = Numidium.new(break_on_fail: true, raise: true, prefix: "block> ", verbose: true) do
 
 	after -> (success) { puts success==0 && "block method OK" || nil }
 
@@ -28,6 +28,10 @@ $test_block = Numidium.new(break_on_fail: true, raise: true, prefix: "core> ") d
 		add("fail with the message given to the assert method") do
 			Numidium.block("block"){ assert("assert"){ false } }[1].call == "assert"
 		end
+
+    add("use the test description") do
+      Numidium.block("message"){ assert { false } }[0] == "message"
+    end
 	end)
 
 	add(Numidium.new(prefix: "assert should be able to ") do
