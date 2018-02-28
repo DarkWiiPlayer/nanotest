@@ -1,8 +1,8 @@
-require_relative "lib/numidium/version"
+require_relative "lib/numidium"
 
 Gem::Specification.new do |spec|
   spec.name = "numidium"
-  spec.version = Numidium.version.join "."
+  spec.version = Numidium::version.join "."
   spec.homepage   = 'https://github.com/DarkWiiPlayer/numidium'
   spec.metadata    = { "source_code_uri" => "https://github.com/DarkWiiPlayer/numidium" }
   spec.authors = ["Dennis Fischer"]
