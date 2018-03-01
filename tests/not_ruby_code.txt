@@ -1,2 +1,0 @@
-this file does not contain ruby code
-it should obviously fail syntax tests

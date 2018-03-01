@@ -1,9 +1,8 @@
 task default: :install
-require_relative "lib/numidium/version"
+require_relative "lib/numidium"
 
 task :test do
-  puts
-  abort unless system "ruby tests/run.rb"
+  require_relative "tests/run"
 end
 
 task :clean do

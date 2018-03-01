@@ -1,9 +1,17 @@
 # vim: set noexpandtab :miv
-require 'benchmark'
+require_relative 'report'
+require_relative 'stage'
 
 module Numidium
-	attr_reader :description
 	class Test
+		attr_reader :description
+
+		def self.assert(*args, &block)
+			new do
+				assert(*args, &block)
+			end
+		end
+
 		def initialize(*args, &block)
 			args.flatten!
 			if (idx=args.find_index{|arg| arg.is_a? String}) then
@@ -22,9 +30,8 @@ module Numidium
 		end
 
 		def run(*args)
-			result = Numidium::Result.new @description, self
-			result.evaluate @method, *args
-			result
+			result = Numidium::Stage.new self, args
+			result.evaluate @method
 		end
 
 		def try(*args)
@@ -32,40 +39,12 @@ module Numidium
 		end
 		def to_s() @description and "#{super}: #{@description}" or super; end
 	end
-
-	class Result
-		attr_reader :success, :reason, :time, :exception
-		def initialize(desc, test)
-			@description = desc; @test = test
-		end
-		def evaluate(method, *args)
-			res = nil
-			@time = Benchmark.measure do
-				res = instance_exec(*args, &method)
-			rescue Exception => e
-				res = e
-			end
-			if res == true then
-				@success = true
-			elsif res.is_a? Exception then
-				@success   = false
-				@reason    = "The test has raised an exception. (#{res.class})"
-				@exception = res
-			elsif !res then
-				@success = false
-				@reason  = @description
-			else
-				@success = false
-				@reason  = res.to_s
-			end
-		end
-
-		def to_s() "#{super} for #{@test}"; end
-	end
 end
 
 if $0 == __FILE__ then
-	test = Numidium::Test.new("Argument should not be nil", -> (arg) { !arg.nil? })
-	puts test.run().success
-	puts test.run().exception
+	test = Numidium::Test.new("%s should work?", lambda do |name|
+		fail "No it doesn't!"
+	end)
+
+	puts test.run("Gravity")
 end
