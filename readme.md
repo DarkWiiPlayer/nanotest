@@ -1,5 +1,14 @@
-Numidium [![Build Status](https://travis-ci.org/DarkWiiPlayer/numidium.svg?branch=master)](https://travis-ci.org/DarkWiiPlayer/numidium) [![Gem Version](https://badge.fury.io/rb/numidium.svg)](https://badge.fury.io/rb/numidium)
-============
+Numidium
+==========
+
+Numidium is a Library mainly intended for [TDD](https://en.wikipedia.org/wiki/Test-driven_development). The core principiles of Numidium are
+- Simplicity of Implementation: doing more things with less code / classes.
+- Simplicity of Use: offering more options in less idioms.
+- Flexibility: allowing for more while needing less boilerplate.
+- Modularity: a small core implementation and some modules stacked on top of it.
+
+As a result of this, Numidium consists of a very small "core", implementing concepts like "tests", "assertions" and "test suites". To avoid needless complexity, Numidium doesn't reinvent the wheel.
+There are no "equals" or "is_type" assertions, because there is equally convenient ruby methods that do exactly that. There are, however, a few factory functions that generate more high-level tests.
 
 Concepts
 ==========

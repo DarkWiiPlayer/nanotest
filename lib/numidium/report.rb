@@ -1,28 +1,32 @@
 # vim: set noexpandtab :miv
 module Numidium
   class Report
-    def initialize()
+    def initialize(opts={})
 			@items = []
+			@title = opts[:title] || "%s"
     end
 
-    def display(depth=0)
+    def display(depth=0, opts={})
 			id = "  " * depth
       lines = @items.map do |item|
+				pref = opts[:prefix_pass] || " "
+				pref_fail = opts[:prefix_fail] || ">"
         case item
 				when String
-					id + item
+					pref + id + item
         when Hash
-					id + "#{item[:message]} (#{item[:src].join(':')})"
+					pref = pref_fail unless item[:success]
+					pref + id + "#{item[:message]} (#{item[:src].join(':')})"
 				when Exception
-					id + "#{item.message} in" +
+					pref_fail + id + "#{item.message} in" +
 						item.backtrace.map{|e| "\n" + id + " ..." + e.to_s}.join
         when Report
-          item.display(depth+1)
+          item.display(depth+1, opts)
 				else
 					"Don't know how to parse: #{item.inspect}"
         end
 			end
-			lines.unshift(id + @description) if @description
+			lines.unshift(id + @title % @description) if @description
 			lines.join("\n")
     end
 

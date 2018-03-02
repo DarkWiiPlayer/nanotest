@@ -42,9 +42,11 @@ module Numidium
 end
 
 if $0 == __FILE__ then
-	test = Numidium::Test.new("%s should work?", lambda do |name|
-		fail "No it doesn't!"
-	end)
+	maps = Numidium::Test.new "%s should work" do |f, m|
+		m.each do |args, res|
+			assert("function should map #{args} to #{res}") { f.call(*args) == res }
+		end
+	end
 
-	puts test.run("Gravity")
+	puts maps.run(->(n){ n }, {1 => 1, 2 => 2, 3 => 4})
 end

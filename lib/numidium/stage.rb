@@ -20,7 +20,7 @@ module Numidium
 					break
 				end
 			end
-			return Numidium::Report.new
+			return Numidium::Report.new(title: "-- %s --")
 				.set_description(sprintf @test.description, *@args)
 				.set_items(@events)
 		end
@@ -45,6 +45,10 @@ module Numidium
 				message: (reason || "Unknown failure condition met"),
 				src: [c.path, c.lineno],
 			})
+		end
+
+		def test(test, *args)
+			Fiber.yield(test.run(*args))
 		end
 
 		def inspect() "Stage for #{@test}"; end
