@@ -104,3 +104,57 @@ Suite descriptions should tell you what the suite does or what it tests
 ```ruby
 test_suite_math = Numidium::Suite.new ""
 ```
+
+Examples
+===
+Here's a short example of a rather pointless test scenario. In this case we want to make sure math still works in ruby.
+
+```ruby
+require_relative "lib/numidium"
+require_relative "lib/numidium/suite"
+
+eval_test =
+  Numidium::Test.new "%s should equal %i" do |expr, result|
+    res = eval(expr)
+    fail "Evaluated to #{res}!" unless res == result
+  end
+
+test_suite_math = Numidium::Suite.new description: "Check if math works" do
+  try eval_test, "1 + 1", 2
+  try eval_test, "1 + 2", 3
+  try eval_test, "1 - 2", -3 # Ooops!
+end
+
+rep = test_suite_math.run
+out =
+  if rep.success then
+    rep.to_s + "\n" +
+    "All tests passed :)"
+  else
+    rep.to_s + "\n" +
+    "Some tests failed :|"
+  end
+puts out
+```
+
+but it seems the programmer made a [last line mistake](https://www.viva64.com/en/b/0260/) in that code.
+
+The output of that code would look somewhat like this:
+
+```
+Check if math works
+===============
+
+ Test passed: 1 + 1 should equal 2
+
+ Test passed: 1 + 2 should equal 3
+
+>Test failed: 1 - 2 should equal -3
+   ./lib/numidium/suite.rb:34:in `block in run'
+   ./lib/numidium/suite.rb:33:in `each'
+   ./lib/numidium/suite.rb:33:in `run'
+   suite.rb:16:in `<main>'
+Some tests failed :|
+```
+
+Since the test constructs the message from its parameters, the error in the test parameters is reflected in its output, making it easy to spot as a copy-paste mistake.

@@ -52,7 +52,7 @@ module Numidium
 					"Test passed: "+sprintf(@description, *args)
 				else
 					"Test failed: "+sprintf(@description, *args)
-				end, res)
+				end, res).delegate
 		end
 
 		def to_s() @description and "#{super}: #{@description}" or super; end
