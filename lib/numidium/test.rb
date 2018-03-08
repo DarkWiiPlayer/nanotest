@@ -16,6 +16,8 @@ module Numidium
 			args.flatten!
 			if (idx=args.find_index{|arg| arg.is_a? String}) then
 				@description = args[idx]
+			else
+				error "creating test without a description"
 			end
 			@method = 
 				if block then
@@ -29,14 +31,30 @@ module Numidium
 				end
 		end
 
+		def report
+			Numidium::Report.new(title: "-- %s --")
+		end
+
+		def execute(*args)
+			stage = Numidium::Stage.new self, args
+			stage.evaluate @method
+		end
+
 		def run(*args)
-			result = Numidium::Stage.new self, args
-			result.evaluate @method
+			report
+				.set_description(sprintf(@description, *args))
+				.set_items(execute(*args))
 		end
 
 		def try(*args)
-			run(*args).success
+			res = run(*args).success
+			Result.new(if res
+					"Test passed: "+sprintf(@description, *args)
+				else
+					"Test failed: "+sprintf(@description, *args)
+				end, res)
 		end
+
 		def to_s() @description and "#{super}: #{@description}" or super; end
 	end
 end

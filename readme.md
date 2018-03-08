@@ -1,5 +1,7 @@
 Numidium
-==========
+==========================================================================================
+
+Note: Numidium has been completely rebuilt in version 0.6!
 
 Numidium is a Library mainly intended for [TDD](https://en.wikipedia.org/wiki/Test-driven_development). The core principiles of Numidium are
 - Simplicity of Implementation: doing more things with less code / classes.
@@ -11,10 +13,10 @@ As a result of this, Numidium consists of a very small "core", implementing conc
 There are no "equals" or "is_type" assertions, because there is equally convenient ruby methods that do exactly that. There are, however, a few factory functions that generate more high-level tests.
 
 Concepts
-==========
+==========================================================================================
 
 Assertions & Failure Conditions
-----------
+-----------------------------------------
 
 These serve as abstractions for the lowest level elements like states, operations, variables, etc. They appear inside tests in the form of method calls.
 
@@ -29,9 +31,24 @@ The key differences are:
   - Assertions inform of both success and failure vs. fail always fails (duh!)
 
 Tests
-----------
+-----------------------------------------
 
-Numidium tests represent smaller features and functionalities. They can take parameters, which is recommended in all but the smallest ad-hoc tests, and take a string argument and either a block or an argument that responds to the :call method.
+Numidium tests represent smaller features and functionalities. They can take parameters, which is recommended in all but the smallest ad-hoc tests. Tests are created with a string describing them and a block or callable object defining the test.
+
+Suites
+-----------------------------------------
+
+Suites provide the highest level of abstraction in Numidium. They represent entire components or features of a project.
+
+Unlike tests, suites will almost exclusively be project-specific.
+
+In Practice
+==========================================================================================
+
+Tests
+-----------------------------------------
+
+Tests can be created easily, they take a string argument, and either a block or an argument that responds to `:call`. The order of the arguments does not matter.
 
 ```ruby
 test_qualified = Nanotest::Test.new("Actor should be qualified") do |actor, role|
@@ -39,8 +56,31 @@ test_qualified = Nanotest::Test.new("Actor should be qualified") do |actor, role
   assert("Actor should be skilled enough") { actor.skill >= role.required_skill}
 end
 ...
-test_qualified.run("Gérard Depardieu", "Edmond Dantès")
+puts test_qualified.run("Gérard Depardieu", "Edmond Dantès")
 ```
+
+Test descriptions *should* describe the desired behavior, similar to assertions.
+
+### Using tests
+
+Tests can be executed in two ways: `run`, which generates a report object and `try`, which only generates a result object. Report objects collect data about the individual assertions and is able to convert this data to a string. Result objects on the other hand only contain success data (true or false) and a message describing the result. They can either be used when we only want to know if a test succeeded.
+
+```ruby
+if test_qualified.try("me", "myself").success then
+  puts "Success!"
+else
+  puts "Oh no!"
+end
+```
+
+### Subtests
+But what would tests be without newting? That's why you can add subtests to tests.
+
+When defining a test, you can use the `test` method to add another Numidium::Test instance as a subtest. Its report will be inserted into the main one and indented with two spaces for easier reading.
+
+The method `try` does almost the same, but instead of generating a new report, it calls `try` on the inserted test, so the main report will only contain a message telling you whether the test passed or not.
+
+### Prettier Descriptions
 
 Before passing the description to the report object it feeds it througn sprintf with the arguments of run(). Since sprintf fails when not enough arguments are provided for a string, it is recommended to only do this in combination with lambdas:
 
@@ -52,4 +92,15 @@ end
 test_animal_fast.run(rabbit) #-> this works
 test_animal_fast.run(dolphin, :nonsense) #-> this works too
 test_animal_fast.run() #-> this fails horribly though
+```
+
+Suites
+-----------------------------------------
+
+Suites are created with a Hash of options. So far the only accepted option is `:description`, which should be a string describing what the suite does, what component it tests, etc.
+
+Suite descriptions should tell you what the suite does or what it tests
+
+```ruby
+test_suite_math = Numidium::Suite.new ""
 ```
