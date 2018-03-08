@@ -5,7 +5,8 @@ module Numidium
 		return @version
 	end
 
-	# TODO: anonymous tests
 	class Failed < StandardError; end
 end
+
 require_relative "numidium/test"
+# require_relative "numidium/suite"

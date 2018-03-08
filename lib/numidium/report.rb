@@ -34,6 +34,29 @@ module Numidium
       display
     end
 
+		def count_failed
+			@items.inject(0) do |acc, item|
+				case item
+				when String
+					acc
+				when Hash
+					acc + (item[:success] ? 0 : 1)
+				when Report
+					acc + item.count_failed
+				else
+					acc
+				end
+			end
+		end
+
+		def failed?
+			count_failed > 0
+		end
+
+		def passed?
+			count failed == 0
+		end
+
 		def items=(ary)
 			raise ArgumentError unless ary.is_a? Array
 			@items=ary.dup
