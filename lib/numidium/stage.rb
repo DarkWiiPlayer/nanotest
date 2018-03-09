@@ -46,10 +46,10 @@ module Numidium
 		def assert(description=nil, &block)
 			desc = description ? ": #{description}" : ""
 			res = !!block.call
-			Fiber.yield Result(if res
-				res[:message] = "Assertion passed" + desc
+			Fiber.yield Result.new(if res
+				"Assertion passed" + desc
 			else
-				res[:message] = "Assertion failed" + desc
+				"Assertion failed" + desc
 			end, res).delegate
 			@success &&= res
 			return res
@@ -57,7 +57,7 @@ module Numidium
 
 		def fail(reason=nil)
 			c = caller_locations(1,1).first
-			Fiber.yield(Result(reason).delegate)
+			Fiber.yield(Result.new(reason).delegate)
 			@success = false
 		end
 
