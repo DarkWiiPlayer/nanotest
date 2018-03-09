@@ -1,4 +1,28 @@
 # vim: set noexpandtab :miv
+
+=begin Drawings ♥ {{{
+
+	┌──────────────────────────────────────────┐
+	│ Stage                                    │
+	├──────────────────────────────────────────┤
+	│ + evaluate(proc-like*): array            │
+	│ - assert(reason:string, block): boolean  │
+	│ - fail(reason: string): nil              │
+	│ - test(:Test): boolean                   │
+	│ - try(:Test): boolean                    │
+	├──────────────────────────────────────────┤
+	│ + test: Test                             │
+	│ + success: boolean                       │
+	│ + events: array                          │
+	└────────────────────┬─────────────────────┘
+											 │
+				┌──────────────┴───────────────┐
+				│ *proc-like means any object  │
+				│ that responds to :call       │
+				└──────────────────────────────┘
+
+=end }}}
+
 require_relative "result"
 require 'fiber'
 module Numidium
@@ -43,19 +67,21 @@ module Numidium
 			return @events
 		end
 
+		def inspect() "Stage for #{@test}"; end
+		alias :to_s :inspect
+
+		private
+
 		def assert(description=nil, &block)
-			desc = description ? ": #{description}" : ""
+			description ||= "Assertion failed"
 			res = !!block.call
-			Fiber.yield Result.new(if res
-				"Assertion passed" + desc
-			else
-				"Assertion failed" + desc
-			end, res).delegate
+			Fiber.yield Result.new(description, res).delegate
 			@success &&= res
 			return res
 		end
 
 		def fail(reason=nil)
+			reason ||= "Test failed"
 			c = caller_locations(1,1).first
 			Fiber.yield(Result.new(reason).delegate)
 			@success = false
@@ -74,8 +100,5 @@ module Numidium
 			@success &&= res.success
 			res.success
 		end
-
-		def inspect() "Stage for #{@test}"; end
-		alias :to_s :inspect
 	end
 end

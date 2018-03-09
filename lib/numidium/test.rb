@@ -48,11 +48,7 @@ module Numidium
 
 		def try(*args)
 			res = run(*args).success
-			Result.new(if res
-					"Test passed: "+sprintf(@description, *args)
-				else
-					"Test failed: "+sprintf(@description, *args)
-				end, res).delegate
+			Result.new(sprintf(@description, *args), res).delegate
 		end
 
 		def to_s() @description and "#{super}: #{@description}" or super; end

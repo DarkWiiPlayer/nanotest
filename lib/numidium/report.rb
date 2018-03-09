@@ -1,7 +1,38 @@
-# vim: set noexpandtab :miv
+# --vim: set noexpandtab :miv--
+
+=begin Drawings :) {{{
+	┌─────────────────────────────────┐
+	│ Report                          │
+	├─────────────────────────────────┤
+	│ + success: boolean              │
+	│ + num_failed: integer           │
+	├─────────────────────────────────┤
+	│ + origin: nil                   │
+	│ + to_s:   string                │
+	│ + set_items(array): self        │
+	│ + set_description(string): self │
+	└─────────────────────────────────┘
+
+	The items array contains a list of Result objects
+	and nested Reports.
+
+	Items ─┐
+	       ├─ Some Result
+	       ├─ Some other Result
+	       ├─┬─ Another Report
+	       │ ├─ Moar Result
+	       │ └─ ...
+	       ├─ Another Result
+	       └─ ...
+=end }}}
+
 require_relative "result"
+require_relative "refinements/string_indent"
+
 module Numidium
   class Report
+		using StringIndent
+
 		attr_reader :success, :num_failed
     def initialize(opts={})
 			@success = nil
@@ -11,31 +42,22 @@ module Numidium
     end
 		def origin() nil; end
 
-    def display(depth=0, opts={})
-			id = "  " * depth
+    def to_s(opts={})
+			depth = (opts[:depth] ||= 0); opts[:depth]+=1
       lines = @items.map do |item|
-				pref = opts[:prefix_pass] || " "
-				pref_fail = opts[:prefix_fail] || ">"
         case item
 				when Result
-					if item.success then
-						pref + id + item.message + "\n"
-					else
-						pref_fail + id + item.message + "\n" +
-							item.origin.map{|p| pref+id+"  "+p.to_s}.join("\n")
-					end
+					item.to_s.indent(depth)
         when Report
-          item.display(depth+1, opts)
+          item.to_s(opts)
 				else
 					raise "Don't know how to parse: #{item.inspect}"
         end
 			end
-			lines.unshift(id + @title % @description) if @description
-			lines.join("\n")
-    end
 
-    def to_s
-      display
+			lines.unshift(@description) if opts[:description]
+
+			lines.join("\n")
     end
 
 		def set_items(ary)
