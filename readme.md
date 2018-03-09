@@ -99,10 +99,14 @@ Suites
 
 Suites are created with a Hash of options. So far the only accepted option is `:description`, which should be a string describing what the suite does, what component it tests, etc.
 
+Like when defining tests, it also has the `try` and `test` methods, which add tests to a list that will get executed once the `run` method is called.
+
 Suite descriptions should tell you what the suite does or what it tests
 
 ```ruby
-test_suite_math = Numidium::Suite.new ""
+test_suite_math = Numidium::Suite.new "Check that math module works correctly"
+test_suite_math.test some_previously_defined_test
+test_suite_math.try some_previously_defined_test
 ```
 
 Examples
