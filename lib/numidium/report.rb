@@ -1,4 +1,4 @@
-# --vim: set noexpandtab :miv--
+# -- vim: set noexpandtab :miv --
 
 =begin Drawings :) {{{
 	┌─────────────────────────────────┐
@@ -42,6 +42,30 @@ module Numidium
     end
 		def origin() nil; end
 
+    def tap
+      res = to_a.each_with_index.map{|e,idx| e.tap(idx+1)}
+      res.unshift("#{1}..#{res.length}")
+    end
+
+    def to_a(nested=false)
+      res = []
+      @items.each do |item|
+        case item
+        when Result
+          res << item
+        when Report
+          if not nested then
+            res.push(*item.to_a(nested))
+          else
+            res.push(item.to_a(nested))
+          end
+        else
+          raise "Weird element :|"
+        end
+      end
+      res
+    end
+
     def to_s(opts={})
 			depth = (opts[:depth] ||= 0); opts[:depth]+=1
       lines = @items.map do |item|
@@ -62,7 +86,7 @@ module Numidium
 
 		def set_items(ary)
 			raise ArgumentError unless ary.is_a? Array
-			@items = ary.dup.freeze
+      @items = ary.dup
 
 			@num_failed = @items.inject(0) do |acc, item|
 				case item

@@ -1,5 +1,8 @@
+# -- vim: set noexpandtab :miv --
+
+=begin {{{
 # ┌────────────────────┐
-# │ Report             │
+# │ Result             │
 # ├────────────────────┤
 # │ + success: boolean │
 # │ + message: string  │
@@ -8,13 +11,16 @@
 # │ + to_s: string     │
 # │ + delegate: nil    │
 # └────────────────────┘
+=end }}}
 
 module Numidium
   class Result
     attr_reader :message, :success
+
     def origin
       @origin.dup
     end
+
     def initialize(arg, success=false, type=:test)
       if arg.is_a? Exception
         @message = arg.message
@@ -25,12 +31,22 @@ module Numidium
       end
       @success = success
     end
-    def to_s
+
+    def to_s(*args)
       [
-        success ? "pass:" : "FAIL:",
+        success ? "+" : "-",
         message
       ].join(" ")
     end
+
+    def tap(number)
+      [
+        success ? "ok" : "not ok",
+        number,
+        message,
+      ].join(" ")
+    end
+
     def delegate
       return @origin.shift && self
     end
