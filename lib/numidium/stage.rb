@@ -74,14 +74,16 @@ module Numidium
 
 		def assert(description=nil, &block)
 			description ||= "Assertion failed"
+			description = sprintf(description, *@args)
 			res = !!block.call
-			Fiber.yield Result.new(description, res).delegate
+			Fiber.yield(Result.new(description, res).delegate)
 			@success &&= res
 			return res
 		end
 
 		def fail(reason=nil)
 			reason ||= "Test failed"
+			reason = sprintf(reason, *@args)
 			c = caller_locations(1,1).first
 			Fiber.yield(Result.new(reason).delegate)
 			@success = false

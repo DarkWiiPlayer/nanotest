@@ -10,7 +10,14 @@ Numidium is a Library mainly intended for [TDD](https://en.wikipedia.org/wiki/Te
 - Modularity: a small core implementation and some modules stacked on top of it.
 
 As a result of this, Numidium consists of a very small "core", implementing concepts like "tests", "assertions" and "test suites". To avoid needless complexity, Numidium doesn't reinvent the wheel.
-There are no "equals" or "is_type" assertions, because there is equally convenient ruby methods that do exactly that. There are, however, a few factory functions that generate more high-level tests.
+There are no "equals" or "is_type" assertions, because there is equally convenient ruby methods that do exactly that. There are, however, a few factory functions that generate more high-level tests. (more like there *will* be tehe~)
+
+TODOs
+==========================================================================================
+
+- Write tests in plain ruby
+- Write some examples
+- Add prefab tests
 
 Concepts
 ==========================================================================================
@@ -114,31 +121,26 @@ Examples
 Here's a short example of a rather pointless test scenario. In this case we want to make sure math still works in ruby.
 
 ```ruby
-require_relative "lib/numidium"
-require_relative "lib/numidium/suite"
+require "lib/numidium"
+require "lib/numidium/suite"
 
-eval_test =
-  Numidium::Test.new "%s should equal %i" do |expr, result|
+expr_test =
+  Numidium::Test.new "expression %s should equal %i" do |expr, result|
     res = eval(expr)
-    fail "Evaluated to #{res}!" unless res == result
+    assert("expression %s should equal %i") { res == result }
   end
 
 test_suite_math = Numidium::Suite.new description: "Check if math works" do
-  try eval_test, "1 + 1", 2
-  try eval_test, "1 + 2", 3
-  try eval_test, "1 - 2", -3 # Ooops!
+  try expr_test, "1 + 1", 2
+  try expr_test, "1 + 2", 3
+  try expr_test, "1 - 2", -3 # Ooops!
 end
 
 rep = test_suite_math.run
-out =
-  if rep.success then
-    rep.to_s + "\n" +
-    "All tests passed :)"
-  else
-    rep.to_s + "\n" +
-    "Some tests failed :|"
-  end
-puts out
+
+puts rep.tap.join("\n")
+puts "-----------------"
+puts rep
 ```
 
 but it seems the programmer made a [last line mistake](https://www.viva64.com/en/b/0260/) in that code.
@@ -146,19 +148,19 @@ but it seems the programmer made a [last line mistake](https://www.viva64.com/en
 The output of that code would look somewhat like this:
 
 ```
+1..3
+ok 1 expression 1 + 1 should equal 2
+ok 2 expression 1 + 2 should equal 3
+not ok 3 expression 1 - 2 should equal -3
+-----------------
 Check if math works
-===============
-
- Test passed: 1 + 1 should equal 2
-
- Test passed: 1 + 2 should equal 3
-
->Test failed: 1 - 2 should equal -3
-   ./lib/numidium/suite.rb:34:in `block in run'
-   ./lib/numidium/suite.rb:33:in `each'
-   ./lib/numidium/suite.rb:33:in `run'
-   suite.rb:16:in `<main>'
-Some tests failed :|
++ expression 1 + 1 should equal 2
++ expression 1 + 2 should equal 3
+- expression 1 - 2 should equal -3
+>   [...]/suite.rb:35:in `block in run'
+>   [...]/suite.rb:34:in `each'
+>   [...]/suite.rb:34:in `run'
+>   suite.rb:16:in `<main>'
 ```
 
 Since the test constructs the message from its parameters, the error in the test parameters is reflected in its output, making it easy to spot as a copy-paste mistake.

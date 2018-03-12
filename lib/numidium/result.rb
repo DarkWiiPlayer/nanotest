@@ -6,15 +6,21 @@
 # ├────────────────────┤
 # │ + success: boolean │
 # │ + message: string  │
-# │ + type:    symbol  │
+# │ - type:    symbol  │
+# │ - origin:  string  │
 # ├────────────────────┤
 # │ + to_s: string     │
+# │ + tap: string      │
 # │ + delegate: nil    │
 # └────────────────────┘
 =end }}}
 
+require_relative "refinements/string_indent.rb"
+
 module Numidium
   class Result
+		using StringIndent
+
     attr_reader :message, :success
 
     def origin
@@ -33,10 +39,12 @@ module Numidium
     end
 
     def to_s(*args)
-      [
+      output = [
         success ? "+" : "-",
         message
-      ].join(" ")
+      ]
+			(@success ? [] : @origin.map{|e| "> " + e.to_s.indent})
+        .unshift(output.join(" "))
     end
 
     def tap(number)

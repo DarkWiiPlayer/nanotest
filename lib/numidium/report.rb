@@ -8,7 +8,9 @@
 	│ + num_failed: integer           │
 	├─────────────────────────────────┤
 	│ + origin: nil                   │
-	│ + to_s:   string                │
+	│ + to_s: string                  │
+	│ + to_a: array                   │
+	│ + tap: string                   │
 	│ + set_items(array): self        │
 	│ + set_description(string): self │
 	└─────────────────────────────────┘
@@ -66,20 +68,19 @@ module Numidium
       res
     end
 
-    def to_s(opts={})
-			depth = (opts[:depth] ||= 0); opts[:depth]+=1
+    def to_s(depth=0, opts={})
       lines = @items.map do |item|
         case item
 				when Result
 					item.to_s.indent(depth)
         when Report
-          item.to_s(opts)
+          item.to_s(depth+1)
 				else
 					raise "Don't know how to parse: #{item.inspect}"
         end
 			end
 
-			lines.unshift(@description) if opts[:description]
+			lines.unshift(@description.indent(depth)) unless opts[:notitle]
 
 			lines.join("\n")
     end
