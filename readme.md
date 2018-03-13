@@ -15,7 +15,7 @@ There are no "equals" or "is_type" assertions, because there is equally convenie
 TODOs
 ==========================================================================================
 
-- Write tests in plain ruby
+- Write tests in plain ruby -- started
 - Write some examples
 - Add prefab tests
 

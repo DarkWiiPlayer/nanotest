@@ -1,4 +1,4 @@
-# vim: set noexpandtab :miv
+# -- vim: set noexpandtab :miv --
 require_relative "test"
 require_relative "report"
 require_relative "refinements/string_indent"

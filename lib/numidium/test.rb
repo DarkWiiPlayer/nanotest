@@ -2,6 +2,21 @@
 require_relative 'report'
 require_relative 'stage'
 
+=begin Drawings ♥ {{{
+┌───────────────────────┐
+│ Numidium::Test        │
+├───────────────────────┤
+│ + run(...): Report    │
+│ + try(...): Result    │
+│ + to_s: String        │
+│ - execute(...): Array │
+│ - report: Report      │
+├───────────────────────┤
+│ + description: String │
+│ - method              │
+└───────────────────────┘
+=end }}}
+
 module Numidium
 	class Test
 		attr_reader :description
@@ -32,7 +47,7 @@ module Numidium
 		end
 
 		def report
-			Numidium::Report.new(title: "-- %s --")
+			Numidium::Report.new
 		end
 
 		def execute(*args)
@@ -48,7 +63,9 @@ module Numidium
 
 		def try(*args)
 			res = run(*args).success
-			Result.new(sprintf(@description, *args), res).delegate
+			res = Result.new(sprintf(@description, *args), res).delegate
+			res.origin = @method
+			return res
 		end
 
 		def to_s() @description and "#{super}: #{@description}" or super; end

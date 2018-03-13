@@ -1,4 +1,4 @@
-# vim: set noexpandtab :miv
+# -- vim: set noexpandtab :miv --
 
 =begin Drawings ♥ {{{
 
@@ -52,8 +52,8 @@ module Numidium
 			@success = []
 			thread = Fiber.new do
 				instance_exec(*@args, &play)
-			rescue Exception => e
-				Fiber.yield(Result.new(e))
+#			rescue Exception => e
+#				Fiber.yield(Result.new(e))
 			end
 
 			loop do

@@ -44,7 +44,7 @@ module Numidium
         message
       ]
 			(@success ? [] : @origin.map{|e| "> " + e.to_s.indent})
-        .unshift(output.join(" "))
+				.unshift(output.join(" ")).join("\n")
     end
 
     def tap(number)
@@ -54,6 +54,10 @@ module Numidium
         message,
       ].join(" ")
     end
+
+		def origin=(orig)
+			@origin = [orig.source_location.join(":")] or raise "New origin has no .source_location" #TODO: proper error msg
+		end
 
     def delegate
       return @origin.shift && self

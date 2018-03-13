@@ -2,8 +2,7 @@ task default: :install
 require_relative "lib/numidium"
 
 task :test do
-  # require_relative "tests/run"
-  # do nothing for now :|
+  require_relative "tests/all"
 end
 
 task :clean do

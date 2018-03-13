@@ -16,9 +16,6 @@ Gem::Specification.new do |spec|
 	spec.files << "lib/numidium.rb"
   Dir.glob("lib/numidium/*").each { |file| spec.files << file }
 
-  spec.files << "rakefile"
-  Dir.glob("tests/*").each { |file| spec.files << file }
-
   spec.files << "license.txt"
   spec.files << "readme.md"
 
