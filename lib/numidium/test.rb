@@ -1,21 +1,21 @@
-# vim: set noexpandtab :miv
+# vim: set noexpandtab foldmarker==begin,=end :miv
 require_relative 'report'
 require_relative 'stage'
 
-=begin Drawings ♥ {{{
-┌───────────────────────┐
-│ Numidium::Test        │
-├───────────────────────┤
-│ + run(...): Report    │
-│ + try(...): Result    │
-│ + to_s: String        │
-│ - execute(...): Array │
-│ - report: Report      │
-├───────────────────────┤
-│ + description: String │
-│ - method              │
-└───────────────────────┘
-=end }}}
+=begin Class Diagram
+	┌───────────────────────┐
+	│ Numidium::Test        │
+	├───────────────────────┤
+	│ + run(...): Report    │
+	│ + try(...): Result    │
+	│ + to_s: String        │
+	│ - execute(...): Array │
+	│ - report: Report      │
+	├───────────────────────┤
+	│ + description: String │
+	│ - method              │
+	└───────────────────────┘
+=end
 
 module Numidium
 	class Test
@@ -51,13 +51,13 @@ module Numidium
 		end
 
 		def execute(*args)
-			stage = Numidium::Stage.new self, args
+			stage = Numidium::Stage.new *args
 			stage.evaluate @method
 		end
 
 		def run(*args)
 			report
-				.set_description(sprintf(@description, *args))
+				.set_description(sprintf(@description, args))
 				.set_items(execute(*args))
 		end
 

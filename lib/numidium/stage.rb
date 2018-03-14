@@ -1,33 +1,30 @@
-# -- vim: set noexpandtab :miv --
+# -- vim: set noexpandtab foldmarker==begin,=end :miv --
 
-=begin Drawings ♥ {{{
-
+=begin Diagrams
 	┌──────────────────────────────────────────┐
 	│ Stage                                    │
 	├──────────────────────────────────────────┤
+	│ + new(test, args): Stage                 │
 	│ + evaluate(proc-like*): array            │
 	│ - assert(reason:string, block): boolean  │
 	│ - fail(reason: string): nil              │
 	│ - test(:Test): boolean                   │
 	│ - try(:Test): boolean                    │
 	├──────────────────────────────────────────┤
-	│ + test: Test                             │
 	│ + success: boolean                       │
 	│ + events: array                          │
-	└────────────────────┬─────────────────────┘
-											 │
-				┌──────────────┴───────────────┐
-				│ *proc-like means any object  │
-				│ that responds to :call       │
-				└──────────────────────────────┘
+	└──────────────────────────────────────────┘
 
-=end }}}
+	┌──────────────────────────────┐
+	│ *proc-like means any object  │
+	│ that responds to :call       │
+	└──────────────────────────────┘
+=end
 
 require_relative "result"
 require 'fiber'
 module Numidium
 	class Stage # Provides a fresh environment every time the test is executed
-		attr_reader :test
 		def success
 			if not @success.nil?
 				@success
@@ -43,8 +40,8 @@ module Numidium
 			end
 		end
 
-		def initialize(test, args)
-			@test = test; @args = args.freeze
+		def initialize(args=[])
+			@args = args.freeze
 		end
 
 		def evaluate(play)
@@ -52,8 +49,8 @@ module Numidium
 			@success = []
 			thread = Fiber.new do
 				instance_exec(*@args, &play)
-#			rescue Exception => e
-#				Fiber.yield(Result.new(e))
+			rescue Exception => e
+				Fiber.yield(Result.new(e))
 			end
 
 			loop do
@@ -66,9 +63,6 @@ module Numidium
 			end
 			return @events
 		end
-
-		def inspect() "Stage for #{@test}"; end
-		alias :to_s :inspect
 
 		private
 

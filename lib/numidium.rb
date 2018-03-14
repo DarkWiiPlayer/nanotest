@@ -1,4 +1,5 @@
-# vim: set noexpandtab :miv
+# -- vim: set noexpandtab foldmarker==begin,=end :miv --
+
 module Numidium
   @version = [0, 6, 0, :dev].freeze
 	def self.version
@@ -6,7 +7,9 @@ module Numidium
 	end
 
 	class Failed < StandardError; end
-end
 
-require_relative "numidium/test"
-# require_relative "numidium/suite"
+	# Because sometimes you really just need assert :)
+	def assert(message=nil, &block)
+		raise(Failed, message) unless block.call
+	end
+end

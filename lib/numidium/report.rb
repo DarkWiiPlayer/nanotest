@@ -1,13 +1,13 @@
-# -- vim: set noexpandtab :miv --
+# -- vim: set noexpandtab foldmarker==begin,=end :miv --
 
-=begin Drawings :) {{{
+=begin Diagrams
 	┌─────────────────────────────────┐
 	│ Report                          │
 	├─────────────────────────────────┤
 	│ + success: boolean              │
 	│ + num_failed: integer           │
 	├─────────────────────────────────┤
-	│ + origin: nil                   │
+	│ + origin: [nil]                 │
 	│ + to_s: string                  │
 	│ + to_a: array                   │
 	│ + tap: string                   │
@@ -26,7 +26,7 @@
 	       │ └─ ...
 	       ├─ Another Result
 	       └─ ...
-=end }}}
+=end
 
 require_relative "result"
 require_relative "refinements/string_indent"
@@ -42,7 +42,7 @@ module Numidium
 			@items = []
 			@title = opts[:title] || "%s"
     end
-		def origin() nil; end
+		def origin() [nil]; end
 
     def tap
       res = to_a.each_with_index.map{|e,idx| e.tap(idx+1)}
@@ -80,7 +80,7 @@ module Numidium
         end
 			end
 
-			lines.unshift(@description.indent(depth)) unless opts[:notitle]
+			lines.unshift(@description.indent(depth)) unless opts[:notitle] if @description
 
 			lines.join("\n")
     end

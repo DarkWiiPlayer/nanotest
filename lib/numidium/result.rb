@@ -1,19 +1,19 @@
-# -- vim: set noexpandtab :miv --
+# -- vim: set noexpandtab foldmarker==begin,=end :miv --
 
-=begin {{{
-# ┌────────────────────┐
-# │ Result             │
-# ├────────────────────┤
-# │ + success: boolean │
-# │ + message: string  │
-# │ - type:    symbol  │
-# │ - origin:  string  │
-# ├────────────────────┤
-# │ + to_s: string     │
-# │ + tap: string      │
-# │ + delegate: nil    │
-# └────────────────────┘
-=end }}}
+=begin
+	┌────────────────────┐
+	│ Result             │
+	├────────────────────┤
+	│ + success: boolean │
+	│ + message: string  │
+	│ - type:    symbol  │
+	│ - origin:  string  │
+	├────────────────────┤
+	│ + to_s: string     │
+	│ + tap: string      │
+	│ + delegate: nil    │
+	└────────────────────┘
+=end
 
 require_relative "refinements/string_indent.rb"
 
@@ -22,10 +22,6 @@ module Numidium
 		using StringIndent
 
     attr_reader :message, :success
-
-    def origin
-      @origin.dup
-    end
 
     def initialize(arg, success=false, type=:test)
       if arg.is_a? Exception
@@ -53,6 +49,10 @@ module Numidium
         number,
         message,
       ].join(" ")
+    end
+
+    def origin
+      @origin.dup
     end
 
 		def origin=(orig)
