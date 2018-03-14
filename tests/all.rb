@@ -1,3 +1,9 @@
+class FailedAssertion < Exception; end
+def assert(msg)
+  raise FailedAssertion, msg unless yield
+  puts "Assertion passed: #{msg}"
+end
+
 puts "Testing base module"
 require_relative "numidium"
 puts "\nTesting Result object"

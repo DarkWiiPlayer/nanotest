@@ -1,11 +1,4 @@
-
 require_relative "../lib/numidium/result"
-
-class FailedAssertion < Exception; end
-def assert(msg)
-  raise FailedAssertion, msg unless yield
-  puts "Assertion passed: #{msg}"
-end
 
 assert("Numidium::Result should be defined") { defined? Numidium::Result }
 
@@ -33,5 +26,5 @@ assert("Unsuccessful results tap string should be correct") do
   subject.tap(3).match? /^not ok\s+3/
 end
 
-subject = Numidium::Result.new(FailedAssertion.new("U Sux!"))
+subject = Numidium::Result.new(Numidium::Failed.new("U Sux!"))
 assert("Exception results should report failure") { not subject.success }

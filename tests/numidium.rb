@@ -1,11 +1,5 @@
 require_relative "../lib/numidium/test"
 
-class FailedAssertion < Exception; end
-def assert(msg)
-  raise FailedAssertion, msg unless yield
-  puts "Assertion passed: #{msg}"
-end
-
 assert("Numidium should be defined") { defined? Numidium }
 assert("Numidium should be a module") { Numidium.is_a? Module }
 assert("Numidium should have a version") { Numidium.version }
