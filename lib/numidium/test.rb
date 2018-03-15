@@ -51,13 +51,13 @@ module Numidium
 		end
 
 		def execute(*args)
-			stage = Numidium::Stage.new *args
+			stage = Numidium::Stage.new args
 			stage.evaluate @method
 		end
 
 		def run(*args)
 			report
-				.set_description(sprintf(@description, args))
+				.set_description(sprintf(@description, *args))
 				.set_items(execute(*args))
 		end
 

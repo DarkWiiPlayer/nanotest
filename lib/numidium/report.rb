@@ -36,6 +36,10 @@ module Numidium
 		using StringIndent
 
 		attr_reader :success, :num_failed
+		def failed?() success==false; end
+		def passed?() success==true;  end
+		def type() :report; end
+
     def initialize(opts={})
 			@success = nil
 			@num_failed = nil
@@ -92,7 +96,7 @@ module Numidium
 			@num_failed = @items.inject(0) do |acc, item|
 				case item
 				when Result
-					item.success && acc || acc+1
+					item.failed? && acc+1 || acc
 				when Report
 					acc + item.num_failed
 				else

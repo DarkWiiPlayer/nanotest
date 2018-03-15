@@ -55,7 +55,7 @@ module Numidium
 
 			loop do
 				res = thread.resume(*@args)
-				if thread.alive?
+				if res.is_a? Numidium::Result
 					@events << res
 				else
 					break
@@ -66,21 +66,47 @@ module Numidium
 
 		private
 
-		def assert(description=nil, &block)
-			description ||= "Assertion failed"
-			description = sprintf(description, *@args)
-			res = !!block.call
-			Fiber.yield(Result.new(description, res).delegate)
-			@success &&= res
-			return res
+		class GivenFalse
+			def binding() binding; end
+
+			def skip(description)
+				Fiber.yield(Result.new(description, :skip).delegate)
+				return nil
+			end
+			alias :pass :skip
+			alias :fail :skip
+			alias :assert :skip
+
+			def given(reason=nil)
+				yield
+			end
+		end
+
+		def assert(description="Assertion")
+			return (yield) ? pass(description) : fail(description)
 		end
 
 		def fail(reason=nil)
-			reason ||= "Test failed"
-			reason = sprintf(reason, *@args)
-			c = caller_locations(1,1).first
-			Fiber.yield(Result.new(reason).delegate)
 			@success = false
+			Fiber.yield(Result.new(sprintf(reason, *@args)).delegate)
+			return false
+		end
+
+		def pass(reason=nil)
+			Fiber.yield(Result.new(sprintf(reason, *@args), true).delegate)
+			return true
+		end
+
+		def skip(description="Unimplemented Test")
+			Fiber.yield(Result.new(sprintf(description, *@args), :skip).delegate)
+		end
+
+		def given(condition, &block)
+			if condition
+				block.call
+			else
+				GivenFalse.new.instance_exec(&block)
+			end
 		end
 
 		def test(test, *args)

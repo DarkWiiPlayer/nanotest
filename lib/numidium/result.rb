@@ -21,9 +21,11 @@ module Numidium
   class Result
 		using StringIndent
 
-    attr_reader :message, :success
+    attr_reader :message, :success, :type
+		def failed?() success==false; end
+		def passed?() success==true;  end
 
-    def initialize(arg, success=false, type=:test)
+    def initialize(arg, type=false, success=nil)
       if arg.is_a? Exception
         @message = arg.message
         @origin  = arg.backtrace_locations
@@ -31,23 +33,43 @@ module Numidium
         @message = arg
         @origin  = caller_locations(2)
       end
-      @success = success
+			case type
+			when true, :pass
+				@success = true
+				@type = :pass
+			when false, :fail
+				@success = false
+				@type = :fail
+			when Symbol
+				@success = success
+				@type = type
+			end
     end
 
     def to_s(*args)
       output = [
-        success ? "+" : "-",
+        case type
+				when :fail
+					'-'
+				when :pass
+					'+'
+				when :skip
+					'~'
+				else
+					'?'
+				end,
         message
       ]
-			(@success ? [] : @origin.map{|e| "> " + e.to_s.indent})
+			(!failed? ? [] : @origin.map{|e| "> " + e.to_s.indent})
 				.unshift(output.join(" ")).join("\n")
     end
 
     def tap(number)
       [
-        success ? "ok" : "not ok",
+        failed? ? "not ok" : "ok", # Optimistic; everything that isn't a fail is a pass
         number,
         message,
+				(type==:skip) ? "# Skip" : nil,
       ].join(" ")
     end
 
