@@ -55,7 +55,7 @@ module Numidium
 
 			loop do
 				res = thread.resume(*@args)
-				if res.is_a? Numidium::Result
+				if res.is_a? Numidium::Result or res.is_a? Numidium::Report
 					@events << res
 				else
 					break
