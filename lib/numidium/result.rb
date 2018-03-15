@@ -29,21 +29,22 @@ module Numidium
       if arg.is_a? Exception
         @message = arg.message
         @origin  = arg.backtrace_locations
+				@type = :exception
       else
         @message = arg
         @origin  = caller_locations(2)
+				case type
+				when true, :pass
+					@success = true
+					@type = :pass
+				when false, :fail
+					@success = false
+					@type = :fail
+				when Symbol
+					@success = success
+					@type = type
+				end
       end
-			case type
-			when true, :pass
-				@success = true
-				@type = :pass
-			when false, :fail
-				@success = false
-				@type = :fail
-			when Symbol
-				@success = success
-				@type = type
-			end
     end
 
     def to_s(*args)
@@ -78,7 +79,7 @@ module Numidium
     end
 
 		def origin=(orig)
-			@origin = [orig.source_location.join(":")] or raise "New origin has no .source_location" #TODO: proper error msg
+			@origin = [orig.source_location.join(":")] or raise "New origin has no .source_location"
 		end
 
     def delegate
