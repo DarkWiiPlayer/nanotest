@@ -61,3 +61,18 @@ end
 assert("to_a should return an Array") do
   subject.to_a.is_a? Array
 end
+
+assert "num_failed should count failed results" do
+  Numidium::Report.new.set_items([
+    Numidium::Result.new("", true),
+    Numidium::Result.new("", false),
+  ]).num_failed == 1
+end
+
+assert "num_failed should only count explicitly failed results" do
+  Numidium::Report.new.set_items([
+    Numidium::Result.new("", :pass),
+    Numidium::Result.new("", :success),
+    Numidium::Result.new("", true),
+  ]).num_failed == 0
+end
