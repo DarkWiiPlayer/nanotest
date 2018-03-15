@@ -32,7 +32,7 @@ module Numidium
 			if (idx=args.find_index{|arg| arg.is_a? String}) then
 				@description = args[idx]
 			else
-				error "creating test without a description"
+				raise "creating test without a description"
 			end
 			@method = 
 				if block then
