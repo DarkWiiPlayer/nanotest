@@ -1,4 +1,4 @@
-Numidium
+Numidium [![Build Status](https://travis-ci.org/DarkWiiPlayer/numidium.svg?branch=master)](https://travis-ci.org/DarkWiiPlayer/numidium) [![Gem Version](https://badge.fury.io/rb/numidium.svg)](https://badge.fury.io/rb/numidium)
 ==========================================================================================
 
 Note: Numidium has been completely rebuilt in version 0.6!
