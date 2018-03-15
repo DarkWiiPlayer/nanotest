@@ -152,10 +152,10 @@ Helper Classes
 Comparator
 -----------------------------------------
 
-Given a reference block during its creation, this object copmares the execution blocks to this reference.
+Given a reference block during its creation, this object copmares the execution time of other blocks to this reference.
 
 ```
-hundred_Is Numidium::Comparator.new { 100.times { |i| i.to_s } }
+hundred_Is = Numidium::Comparator.new { 100.times { |i| i.to_s } }
 hundred_Is.compare { 10.times { puts "PrInTiNg StUfF" } }
 ```
 
