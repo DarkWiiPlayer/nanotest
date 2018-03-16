@@ -7,7 +7,9 @@
 	│ + new(test, args): Stage                 │
 	│ + evaluate(proc-like*): array            │
 	│ - assert(reason:string, block): boolean  │
-	│ - fail(reason: string): nil              │
+	│ - fail(reason: string): false            │
+	│ - pass(reason: string): true             │
+	│ - skip(reason: string): nil              │
 	│ - test(:Test): boolean                   │
 	│ - try(:Test): boolean                    │
 	├──────────────────────────────────────────┤

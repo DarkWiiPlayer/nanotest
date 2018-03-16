@@ -5,6 +5,8 @@
 	│ Report                          │
 	├─────────────────────────────────┤
 	│ + success: boolean              │
+	│ + passed?: boolean              │
+	│ + failed?: boolean              │
 	│ + num_failed: integer           │
 	├─────────────────────────────────┤
 	│ + origin: [nil]                 │

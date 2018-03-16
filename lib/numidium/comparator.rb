@@ -1,4 +1,5 @@
 # -- vim: set noexpandtab foldmarker==begin,=end :miv --
+require "benchmark"
 
 module Numidium
   class Comparator

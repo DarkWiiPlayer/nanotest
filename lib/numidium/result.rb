@@ -5,6 +5,8 @@
 	│ Result             │
 	├────────────────────┤
 	│ + success: boolean │
+	│ + passed?: boolean │
+	│ + failed?: boolean │
 	│ + message: string  │
 	│ - type:    symbol  │
 	│ - origin:  string  │
