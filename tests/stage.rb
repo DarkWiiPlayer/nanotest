@@ -39,18 +39,6 @@ assert "Evaluate should return an array of events" do
 	end).is_a? Array
 end
 
-assert "fail should register a failed test" do
-  not Numidium::Stage.new.evaluate(proc do
-    fail "Cuz Reaons, you know?"
-  end).only.success
-end
-
-assert "pass should register a passed test" do
-  Numidium::Stage.new.evaluate(proc do
-    pass "Cuz Reaons, you know?"
-  end).only.success
-end
-
 assert "assert should return the success within the test" do
   Numidium::Stage.new.evaluate(proc do
     assert { assert { true } == true }
@@ -79,7 +67,7 @@ end
 assert "fail should not abort test runs" do
 	var = 1
 	Numidium::Stage.new.evaluate(proc do
-		fail "reason"
+		assert("reason") { false }
 		var = 2
 	end)
 	var == 2
@@ -94,7 +82,7 @@ end
 assert "given should change nothing when condition is met" do
   Numidium::Stage.new.evaluate(proc do
     given true do
-      pass "yes"
+      assert("yes") { true }
     end
   end).only.type == :pass
 end

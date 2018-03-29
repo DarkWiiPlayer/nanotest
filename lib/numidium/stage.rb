@@ -85,18 +85,13 @@ module Numidium
 		end
 
 		def assert(description="Assertion")
-			return (yield) ? pass(description) : fail(description)
-		end
-
-		def fail(reason=nil)
-			@success = false
-			Fiber.yield(Result.new(sprintf(reason, *@args)).delegate)
-			return false
-		end
-
-		def pass(reason=nil)
-			Fiber.yield(Result.new(sprintf(reason, *@args), true).delegate)
-			return true
+			if (yield)
+				Fiber.yield(Result.new(sprintf(description, *@args), true).delegate)
+				return true
+			else
+				Fiber.yield(Result.new(sprintf(description, *@args), false).delegate)
+				return false
+			end
 		end
 
 		def skip(description="Unimplemented Test")
