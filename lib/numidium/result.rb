@@ -31,10 +31,11 @@ module Numidium
 
     def initialize(arg, type=false, success=nil)
       if arg.is_a? Exception
-        @message = arg.message
+				@message = "Exception: " + arg.message
         @origin  = arg.backtrace_locations
 				@type = :exception
 				@exception = arg
+				@success = false
       else
         @message = arg
         @origin  = caller_locations(2)
@@ -72,13 +73,12 @@ module Numidium
 
     def tap(number)
       [
-				case type
-				when :pass
+				if passed?
 					"ok"
-				when :fail, :exception
+				elsif failed? or type==:skip
 					"not ok"
 				else
-					""
+					"#"
 				end,
         number,
 				message.split("\n").join(" "),

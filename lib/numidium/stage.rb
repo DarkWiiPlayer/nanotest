@@ -69,10 +69,11 @@ module Numidium
 		private
 
 		class GivenFalse
+			def initialize(args) @args=args; end
 			def binding() binding; end
 
 			def skip(description)
-				Fiber.yield(Result.new(description, :skip).delegate)
+				Fiber.yield(Result.new(sprintf(description, *@args), :skip).delegate)
 				return nil
 			end
 			alias :pass :skip
@@ -102,7 +103,7 @@ module Numidium
 			if condition
 				block.call
 			else
-				GivenFalse.new.instance_exec(&block)
+				GivenFalse.new(@args).instance_exec(&block)
 			end
 		end
 
