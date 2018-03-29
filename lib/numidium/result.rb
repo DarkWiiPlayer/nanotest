@@ -1,20 +1,21 @@
 # -- vim: set noexpandtab foldmarker==begin,=end :miv --
 
 =begin
-	┌────────────────────┐
-	│ Result             │
-	├────────────────────┤
-	│ + success: boolean │
-	│ + passed?: boolean │
-	│ + failed?: boolean │
-	│ + message: string  │
-	│ - type:    symbol  │
-	│ - origin:  string  │
-	├────────────────────┤
-	│ + to_s: string     │
-	│ + tap: string      │
-	│ + delegate: nil    │
-	└────────────────────┘
+	┌────────────────────────┐
+	│ Result                 │
+	├────────────────────────┤
+	│ + exception: exception │
+	│ + success: boolean     │
+	│ + passed?: boolean     │
+	│ + failed?: boolean     │
+	│ + message: string      │
+	│ - type:    symbol      │
+	│ - origin:  string      │
+	├────────────────────────┤
+	│ + to_s: string         │
+	│ + tap: string          │
+	│ + delegate: nil        │
+	└────────────────────────┘
 =end
 
 require_relative "refinements/string_indent.rb"
@@ -26,12 +27,14 @@ module Numidium
     attr_reader :message, :success, :type
 		def failed?() success==false; end
 		def passed?() success==true;  end
+		def exception?() @exception or false; end
 
     def initialize(arg, type=false, success=nil)
       if arg.is_a? Exception
         @message = arg.message
         @origin  = arg.backtrace_locations
 				@type = :exception
+				@exception = arg
       else
         @message = arg
         @origin  = caller_locations(2)
@@ -63,16 +66,28 @@ module Numidium
 				end,
         message
       ]
-			(!failed? ? [] : @origin.map{|e| "> " + e.to_s.indent})
+			(!failed? ? [] : @origin.map{|e| ". " + e.to_s.indent})
 				.unshift(output.join(" ")).join("\n")
     end
 
     def tap(number)
       [
-        failed? ? "not ok" : "ok", # Optimistic; everything that isn't a fail is a pass
+				case type
+				when :pass
+					"ok"
+				when :fail, :exception
+					"not ok"
+				else
+					""
+				end,
         number,
-        message,
-				(type==:skip) ? "# Skip" : nil,
+				message.split("\n").join(" "),
+				case type
+				when :skip
+					"# skip"
+				when :exception
+					"\nMore tests may have been skipped after the exception!"
+				end
       ].join(" ")
     end
 
