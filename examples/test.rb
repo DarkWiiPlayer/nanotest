@@ -1,21 +1,11 @@
 require_relative "../lib/numidium"
 require_relative "../lib/numidium/test"
 
-expr_test =
-  Numidium::Test.new "expression %s should equal %i" do |expr, result|
-    res = eval(expr)
-    assert("%s should equal %i") { res == result }
-  end
-
-test_math = Numidium::Test.new "Check if math works" do
-  try expr_test, "1 + 1", 2
-  test expr_test, "1 + 2", 3
-  test expr_test, "1 - 2", -3 # Ooops!
-  skip "Do this later"
+class Foo
+  def bar() true; end
 end
 
-rep = test_math.run
-
-puts rep.tap.join("\n")
-puts "-----------------"
-puts rep
+puts Numidium::Test.new("%s should bar", lambda do |subject|
+  assert("%s should respond to bar") { subject.new.respond_to? :bar }
+  assert("%s.bar should return true") { subject.new.bar }
+end).run(Foo).to_s
