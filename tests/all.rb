@@ -14,5 +14,4 @@ puts "\nTesting Numidium::Stage"
 require_relative "stage"
 puts "\nTesting Numidium::Test"
 require_relative "test"
-
-puts "All OK :)"
+puts ""
