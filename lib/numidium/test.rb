@@ -70,4 +70,10 @@ module Numidium
 
 		def to_s() @description and "#{super}: #{@description}" or super; end
 	end
+
+	def self.wrap(original, description, *parameters)
+    return Numidium::Test.new(description, ->(subject) do
+      test(original, *parameters)
+    end)
+  end
 end
