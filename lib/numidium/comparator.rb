@@ -5,8 +5,13 @@ module Numidium
   class Comparator
     def initialize(method=:real, &block)
       @method = method
-      @reference = Benchmark::measure(&block).send(@method)
+			@block  = block
+			@reference = Benchmark::measure(&@block).send(@method)
     end
+
+		def retry()
+			self.class.new(&@block)
+		end
 
     def compare(&block)
       Benchmark::measure(&block).send(@method) / @reference
