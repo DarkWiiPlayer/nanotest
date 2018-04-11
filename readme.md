@@ -3,6 +3,8 @@ Numidium [![Build Status](https://travis-ci.org/DarkWiiPlayer/numidium.svg?branc
 
 Note: Numidium has been completely rebuilt in version 0.6!
 
+Warning: This repository is highly volatile. Before version 1.0 I may or may not decide to `push --force` history changes.
+
 Numidium is a Library/Toolbox mainly intended for [TDD](https://en.wikipedia.org/wiki/Test-driven_development). The core principiles of Numidium are
 - Simplicity of Implementation: doing more things with less code / classes.
 - Simplicity of Use: offering more options in less idioms.
